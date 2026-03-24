@@ -6,7 +6,7 @@ Each test case consists of an **input CSV** and the corresponding **expected out
 
 | Input file | Vertices | Holes | Target | Output file |
 |---|---|---|---|---|
-| `input_rectangle_with_two_holes.csv` | 12 | 2 | 7 | `output_rectangle_with_two_holes.txt` |
+| `input_rectangle_with_two_holes.csv` | 12 | 2 | 11 | `output_rectangle_with_two_holes.txt` |
 | `input_cushion_with_hexagonal_hole.csv` | 22 | 1 | 13 | `output_cushion_with_hexagonal_hole.txt` |
 | `input_blob_with_two_holes.csv` | 36 | 2 | 17 | `output_blob_with_two_holes.txt` |
 | `input_wavy_with_three_holes.csv` | 43 | 3 | 21 | `output_wavy_with_three_holes.txt` |
