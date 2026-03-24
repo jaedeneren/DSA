@@ -69,6 +69,15 @@ void Simplifier::run(int targetVertices)
             continue; 
         }
 
+        // 1b. STALE CANDIDATE CHECK: the queue can still contain candidates
+        // whose vertices are active but are no longer consecutive after nearby
+        // collapses. Those candidates must not be applied.
+        if (best.A->next != best.B || best.B->next != best.C || best.C->next != best.D ||
+            best.B->prev != best.A || best.C->prev != best.B || best.D->prev != best.C) {
+            delete best.E;
+            continue;
+        }
+
         // 2. TOPOLOGY CHECK: Does this move break the shape?
         if (!spatialMap.isTopologyValid(best.A, best.B, best.C, best.D, best.E)) {
             // It intersects something! Discard it.
