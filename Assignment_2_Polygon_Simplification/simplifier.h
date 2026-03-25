@@ -9,13 +9,14 @@ struct CollapseCandidate {
     Vertex *E; // The proposed replacement
     double cost;
     int candidateRank;
+    int evalVersion;
     
     bool operator>(const CollapseCandidate& other) const {
         if (std::abs(cost - other.cost) > 1e-12) return cost > other.cost;
+        if (candidateRank != other.candidateRank) return candidateRank > other.candidateRank;
         if (std::abs(E->y - other.E->y) > 1e-9) return E->y > other.E->y;
         if (A->id != other.A->id) return A->id < other.A->id;
         if (std::abs(E->x - other.E->x) > 1e-9) return E->x > other.E->x;
-        if (candidateRank != other.candidateRank) return candidateRank > other.candidateRank;
         return false;
     }
 };
