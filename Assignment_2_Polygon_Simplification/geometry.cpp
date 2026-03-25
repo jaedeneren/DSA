@@ -6,6 +6,26 @@
 namespace {
 constexpr double kEpsilon = 1e-12;
 
+double signedLineValue(double ax, double ay, double dx, double dy, double px, double py) {
+    return (dx - ax) * (py - ay) - (dy - ay) * (px - ax);
+}
+
+double pointLineDistance(double ax, double ay, double dx, double dy, double px, double py) {
+    double numerator = std::abs(signedLineValue(ax, ay, dx, dy, px, py));
+    double denominator = std::hypot(dx - ax, dy - ay);
+    if (denominator < kEpsilon) {
+        return 0.0;
+    }
+    return numerator / denominator;
+}
+
+int sideOfDirectedLine(double ax, double ay, double dx, double dy, double px, double py) {
+    double value = signedLineValue(ax, ay, dx, dy, px, py);
+    if (value > kEpsilon) return 1;
+    if (value < -kEpsilon) return -1;
+    return 0;
+}
+
 Vertex* intersectLines(
     double a1, double b1, double c1,
     double a2, double b2, double c2,
@@ -60,6 +80,52 @@ std::vector<Vertex*> Geometry::calculateE(Vertex* A, Vertex* B, Vertex* C, Verte
     double b_CD = cx - dx;     
     double c_CD = dx * cy - cx * dy;
     Vertex* eOnCD = intersectLines(a, b, c_E, a_CD, b_CD, c_CD, A, A->ring_id);
+
+    bool useInteriorPlacementRule = A->ring_id != 0 && B->id < 0;
+
+    if (useInteriorPlacementRule && (eOnAB || eOnCD)) {
+        Vertex* chosen = nullptr;
+
+        if (!eOnAB || !eOnCD) {
+            chosen = eOnAB ? eOnAB : eOnCD;
+        } else {
+            int sideB_AD = sideOfDirectedLine(A->x, A->y, D->x, D->y, B->x, B->y);
+            int sideC_AD = sideOfDirectedLine(A->x, A->y, D->x, D->y, C->x, C->y);
+
+            if (sideB_AD == sideC_AD) {
+                double distB_AD = pointLineDistance(A->x, A->y, D->x, D->y, B->x, B->y);
+                double distC_AD = pointLineDistance(A->x, A->y, D->x, D->y, C->x, C->y);
+                chosen = (distB_AD > distC_AD + kEpsilon) ? eOnCD : eOnAB;
+            } else {
+                int sideE_AD = 0;
+                double sampleX = A->x;
+                double sampleY = A->y;
+                if (std::abs(c_E) > kEpsilon) {
+                    if (std::abs(b) > kEpsilon) {
+                        sampleY = (-c_E) / b + A->y;
+                    } else if (std::abs(a) > kEpsilon) {
+                        sampleX = (-c_E) / a + A->x;
+                    }
+                    sideE_AD = sideOfDirectedLine(A->x, A->y, D->x, D->y, sampleX, sampleY);
+                }
+                chosen = (sideB_AD == sideE_AD) ? eOnAB : eOnCD;
+            }
+        }
+
+        if (chosen) {
+            candidates.push_back(chosen);
+        }
+        if (eOnAB && eOnAB != chosen) {
+            delete eOnAB;
+        }
+        if (eOnCD && eOnCD != chosen) {
+            delete eOnCD;
+        }
+        if (candidates.empty()) {
+            candidates.push_back(new Vertex(-1, A->ring_id, B->x, B->y));
+        }
+        return candidates;
+    }
 
     // Keep both valid area-preserving intersections and let the priority queue
     // rank them. Several test cases depend on deterministic tie-breaking here.

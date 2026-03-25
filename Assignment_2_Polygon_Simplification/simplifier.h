@@ -8,10 +8,12 @@ struct CollapseCandidate {
     Vertex *A, *B, *C, *D;
     Vertex *E; // The proposed replacement
     double cost;
+    double priorityCost;
     int candidateRank;
     int evalVersion;
     
     bool operator>(const CollapseCandidate& other) const {
+        if (std::abs(priorityCost - other.priorityCost) > 1e-12) return priorityCost > other.priorityCost;
         if (std::abs(cost - other.cost) > 1e-12) return cost > other.cost;
         if (candidateRank != other.candidateRank) return candidateRank > other.candidateRank;
         if (std::abs(E->y - other.E->y) > 1e-9) return E->y > other.E->y;

@@ -1,4 +1,14 @@
 #include "spatialmap.h"
+#include <cstdint>
+#include <unordered_set>
+
+namespace {
+std::uint64_t makeSegmentKey(Vertex* a, Vertex* b) {
+    std::uintptr_t lo = reinterpret_cast<std::uintptr_t>(std::min(a, b));
+    std::uintptr_t hi = reinterpret_cast<std::uintptr_t>(std::max(a, b));
+    return static_cast<std::uint64_t>(lo) ^ (static_cast<std::uint64_t>(hi) << 1);
+}
+}
 
 // --- Helper Math: Checks if two line segments cross ---
 int SpatialMap::orientation(Vertex* p, Vertex* q, Vertex* r) {
@@ -116,6 +126,42 @@ bool SpatialMap::isTopologyValid(Vertex* A, Vertex* B, Vertex* C, Vertex* D, Ver
         }
     }
     return true; // Safe to collapse!
+}
+
+int SpatialMap::countInactiveOriginalCrossings(Vertex* A, Vertex* B, Vertex* C, Vertex* D, Vertex* E) {
+    if (A->ring_id == 0 || A->id >= 0 || B->id < 0 || C->id < 0) {
+        return 0;
+    }
+
+    auto cellsAE = getCellsForSegment(A, E);
+    auto cellsED = getCellsForSegment(E, D);
+    std::vector<std::pair<int, int>> cellsToCheck = cellsAE;
+    cellsToCheck.insert(cellsToCheck.end(), cellsED.begin(), cellsED.end());
+
+    std::unordered_set<std::uint64_t> countedSegments;
+    int conflicts = 0;
+
+    for (const auto& cell : cellsToCheck) {
+        for (const auto& segment : grid[cell]) {
+            if (segment.first->isActive || segment.second->isActive) continue;
+            if (segment.first->ring_id != A->ring_id || segment.second->ring_id != A->ring_id) continue;
+            if (segment.first->id < 0 || segment.second->id < 0) continue;
+            if ((segment.first->id == B->id && segment.second->id == C->id) ||
+                (segment.first->id == C->id && segment.second->id == B->id)) {
+                continue;
+            }
+
+            std::uint64_t key = makeSegmentKey(segment.first, segment.second);
+            if (!countedSegments.insert(key).second) continue;
+
+            if (checkIntersection(A, E, segment.first, segment.second) ||
+                checkIntersection(E, D, segment.first, segment.second)) {
+                ++conflicts;
+            }
+        }
+    }
+
+    return conflicts;
 }
 
 void SpatialMap::updateIndex(Vertex* A, Vertex* D, Vertex* E) {

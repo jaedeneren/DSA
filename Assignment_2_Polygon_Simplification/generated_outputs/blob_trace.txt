@@ -1,0 +1,276 @@
+candidate ring=0 A=0 B=1 C=2 D=3 E=(66.6667,-16.6667) cost=7272.73 score=7272.73
+candidate ring=0 A=0 B=1 C=2 D=3 E=(733.333,-50) cost=11428.6 score=11428.6
+candidate ring=0 A=1 B=2 C=3 D=4 E=(280,-30) cost=5333.33 score=5333.33
+candidate ring=0 A=1 B=2 C=3 D=4 E=(1000,30) cost=9600 score=9600
+candidate ring=0 A=2 B=3 C=4 D=5 E=(628.571,-34.2857) cost=1200 score=1200
+candidate ring=0 A=2 B=3 C=4 D=5 E=(680,-30) cost=2000 score=2000
+candidate ring=0 A=3 B=4 C=5 D=6 E=(1133.33,50) cost=6666.67 score=6666.67
+candidate ring=0 A=3 B=4 C=5 D=6 E=(1022.22,44.4444) cost=1428.57 score=1428.57
+candidate ring=0 A=4 B=5 C=6 D=7 E=(1485.71,171.429) cost=48571.4 score=48571.4
+candidate ring=0 A=4 B=5 C=6 D=7 E=(1212.5,50) cost=6938.78 score=6938.78
+candidate ring=0 A=5 B=6 C=7 D=8 E=(1250,-12.5) cost=6938.78 score=6938.78
+candidate ring=0 A=5 B=6 C=7 D=8 E=(1286.96,52.1739) cost=10967.7 score=10967.7
+candidate ring=0 A=6 B=7 C=8 D=9 E=(1200,0) cost=10000 score=10000
+candidate ring=0 A=6 B=7 C=8 D=9 E=(1250,600) cost=10000 score=10000
+candidate ring=0 A=7 B=8 C=9 D=10 E=(450,3400) cost=300000 score=300000
+candidate ring=0 A=7 B=8 C=9 D=10 E=(1200,650) cost=7692.31 score=7692.31
+candidate ring=0 A=8 B=9 C=10 D=11 E=(1259.09,636.364) cost=4687.5 score=4687.5
+candidate ring=0 A=8 B=9 C=10 D=11 E=(1225,687.5) cost=7500 score=7500
+candidate ring=0 A=9 B=10 C=11 D=12 E=(1060,790) cost=2857.14 score=2857.14
+candidate ring=0 A=9 B=10 C=11 D=12 E=(992.308,826.923) cost=3529.41 score=3529.41
+candidate ring=0 A=10 B=11 C=12 D=13 E=(1100,750) cost=5000 score=5000
+candidate ring=0 A=10 B=11 C=12 D=13 E=(500,1000) cost=5000 score=5000
+candidate ring=0 A=11 B=12 C=13 D=14 E=(100,1050) cost=30000 score=30000
+candidate ring=0 A=11 B=12 C=13 D=14 E=(460,990) cost=3750 score=3750
+candidate ring=0 A=12 B=13 C=14 D=15 E=(440,1030) cost=6428.57 score=6428.57
+candidate ring=0 A=12 B=13 C=14 D=15 E=(366.667,1016.67) cost=7500 score=7500
+candidate ring=0 A=13 B=14 C=15 D=16 E=(268.421,942.105) cost=2410.71 score=2410.71
+candidate ring=0 A=13 B=14 C=15 D=16 E=(219.231,903.846) cost=4218.75 score=4218.75
+candidate ring=0 A=14 B=15 C=16 D=17 E=(100,750) cost=1875 score=1875
+candidate ring=0 A=14 B=15 C=16 D=17 E=(66.6667,700) cost=1875 score=1875
+candidate ring=0 A=15 B=16 C=17 D=18 E=(37.5,631.25) cost=681.818 score=681.818
+candidate ring=0 A=15 B=16 C=17 D=18 E=(25,600) cost=1071.43 score=1071.43
+candidate ring=0 A=16 B=17 C=18 D=19 E=(-50,350) cost=2187.5 score=2187.5
+candidate ring=0 A=16 B=17 C=18 D=19 E=(-53.8462,311.538) cost=875 score=875
+candidate ring=0 A=17 B=18 C=19 D=0 E=(-35,360) cost=3088.24 score=3088.24
+candidate ring=0 A=18 B=19 C=0 D=1 E=(75,-75) cost=11250 score=11250
+candidate ring=0 A=18 B=19 C=0 D=1 E=(26.087,-6.52174) cost=2571.43 score=2571.43
+candidate ring=0 A=19 B=0 C=1 D=2 E=(0,-50) cost=6666.67 score=6666.67
+candidate ring=0 A=19 B=0 C=1 D=2 E=(80,-80) cost=8571.43 score=8571.43
+candidate ring=1 A=0 B=1 C=2 D=3 E=(200,430) cost=5714.29 score=5714.29
+candidate ring=1 A=0 B=1 C=2 D=3 E=(247.059,467.647) cost=4800 score=4800
+candidate ring=1 A=1 B=2 C=3 D=4 E=(350,500) cost=6000 score=6000
+candidate ring=1 A=1 B=2 C=3 D=4 E=(450,480) cost=7500 score=7500
+candidate ring=1 A=2 B=3 C=4 D=5 E=(473.077,392.308) cost=1578.95 score=1578.95
+candidate ring=1 A=2 B=3 C=4 D=5 E=(483.333,366.667) cost=2727.27 score=2727.27
+candidate ring=1 A=3 B=4 C=5 D=6 E=(450,250) cost=1875 score=1875
+candidate ring=1 A=3 B=4 C=5 D=6 E=(428.571,214.286) cost=1500 score=1500
+candidate ring=1 A=4 B=5 C=6 D=0 E=(375,150) cost=2727.27 score=2727.27
+candidate ring=1 A=4 B=5 C=6 D=0 E=(333.333,133.333) cost=2307.69 score=2307.69
+candidate ring=1 A=5 B=6 C=0 D=1 E=(240,120) cost=4285.71 score=4285.71
+candidate ring=1 A=5 B=6 C=0 D=1 E=(200,150) cost=3333.33 score=3333.33
+candidate ring=1 A=6 B=0 C=1 D=2 E=(150,225) cost=5000 score=5000
+candidate ring=1 A=6 B=0 C=1 D=2 E=(150,300) cost=5000 score=5000
+candidate ring=2 A=0 B=1 C=2 D=3 E=(750,350) cost=0 score=0
+candidate ring=2 A=1 B=2 C=3 D=4 E=(950,650) cost=0 score=0
+candidate ring=2 A=2 B=3 C=4 D=5 E=(964.286,671.429) cost=1315.79 score=1315.79
+candidate ring=2 A=2 B=3 C=4 D=5 E=(977.273,668.182) cost=1923.08 score=1923.08
+candidate ring=2 A=3 B=4 C=5 D=6 E=(1050,550) cost=3571.43 score=3571.43
+candidate ring=2 A=3 B=4 C=5 D=6 E=(1062.5,475) cost=1923.08 score=1923.08
+candidate ring=2 A=4 B=5 C=6 D=7 E=(1057.69,426.923) cost=1388.89 score=1388.89
+candidate ring=2 A=4 B=5 C=6 D=7 E=(1050,400) cost=2083.33 score=2083.33
+candidate ring=2 A=5 B=6 C=7 D=8 E=(980,310) cost=1428.57 score=1428.57
+candidate ring=2 A=5 B=6 C=7 D=8 E=(940,270) cost=1428.57 score=1428.57
+candidate ring=2 A=6 B=7 C=8 D=0 E=(840,190) cost=2500 score=2500
+candidate ring=2 A=6 B=7 C=8 D=0 E=(814.286,185.714) cost=1500 score=1500
+candidate ring=2 A=7 B=8 C=0 D=1 E=(742.857,171.429) cost=4615.38 score=4615.38
+candidate ring=2 A=7 B=8 C=0 D=1 E=(640,240) cost=6666.67 score=6666.67
+candidate ring=2 A=8 B=0 C=1 D=2 E=(707.143,292.857) cost=555.556 score=555.556
+candidate ring=2 A=8 B=0 C=1 D=2 E=(705.556,283.333) cost=1111.11 score=1111.11
+collapse ring=2 A=0 B=1 C=2 D=3 -> E=(750,350) cost=0
+candidate ring=2 A=7 B=8 C=0 D=-1000 E=(742.857,171.429) cost=4615.38 score=4615.38
+candidate ring=2 A=7 B=8 C=0 D=-1000 E=(640,240) cost=6666.67 score=6666.67
+candidate ring=2 A=0 B=-1000 C=3 D=4 E=(958.333,641.667) cost=2272.73 score=2272.73
+candidate ring=2 A=-1000 B=3 C=4 D=5 E=(964.286,671.429) cost=1315.79 score=3947.37
+candidate ring=2 A=-1000 B=3 C=4 D=5 E=(975,675) cost=2272.73 score=6818.18
+reject inactive ring=2 A=1 B=2 C=3 D=4
+reject inactive ring=2 A=8 B=0 C=1 D=2
+collapse ring=0 A=15 B=16 C=17 D=18 -> E=(37.5,631.25) cost=681.818
+candidate ring=0 A=13 B=14 C=15 D=-1001 E=(266.667,941.667) cost=2596.15 score=2596.15
+candidate ring=0 A=13 B=14 C=15 D=-1001 E=(219.231,903.846) cost=4218.75 score=4218.75
+candidate ring=0 A=14 B=15 C=-1001 D=18 E=(75,725) cost=3552.63 score=3552.63
+candidate ring=0 A=14 B=15 C=-1001 D=18 E=(50,678.571) cost=2327.59 score=2327.59
+candidate ring=0 A=15 B=-1001 C=18 D=19 E=(-32.3529,526.471) cost=9500 score=9500
+candidate ring=0 A=15 B=-1001 C=18 D=19 E=(-70.4545,361.364) cost=7887.45 score=7887.45
+candidate ring=0 A=-1001 B=18 C=19 D=0 E=(-34.6715,358.029) cost=3071.12 score=3071.12
+candidate ring=0 A=-1001 B=18 C=19 D=0 E=(0,941.667) cost=39583.3 score=39583.3
+reject inactive ring=0 A=16 B=17 C=18 D=19
+reject inactive ring=0 A=15 B=16 C=17 D=18
+reject inactive ring=2 A=8 B=0 C=1 D=2
+collapse ring=0 A=2 B=3 C=4 D=5 -> E=(628.571,-34.2857) cost=1200
+candidate ring=0 A=0 B=1 C=2 D=-1002 E=(51.1628,-12.7907) cost=8205.13 score=8205.13
+candidate ring=0 A=0 B=1 C=2 D=-1002 E=(733.333,-50) cost=11428.6 score=11428.6
+candidate ring=0 A=1 B=2 C=-1002 D=5 E=(80,-80) cost=15283.6 score=15283.6
+candidate ring=0 A=1 B=2 C=-1002 D=5 E=(852.83,16.6038) cost=9394.5 score=9394.5
+candidate ring=0 A=2 B=-1002 C=5 D=6 E=(333.333,10) cost=19076.9 score=19076.9
+candidate ring=0 A=2 B=-1002 C=5 D=6 E=(1160,10) cost=15030.3 score=15030.3
+candidate ring=0 A=-1002 B=5 C=6 D=7 E=(1455.67,153.402) cost=43463.9 score=43463.9
+candidate ring=0 A=-1002 B=5 C=6 D=7 E=(1215.74,62.9442) cost=9709.81 score=9709.81
+reject inactive ring=2 A=2 B=3 C=4 D=5
+collapse ring=2 A=4 B=5 C=6 D=7 -> E=(1057.69,426.923) cost=1388.89
+candidate ring=2 A=-1000 B=3 C=4 D=-1003 E=(965,672.5) cost=1415.09 score=7075.47
+candidate ring=2 A=-1000 B=3 C=4 D=-1003 E=(975,675) cost=2272.73 score=11363.6
+candidate ring=2 A=4 B=-1003 C=7 D=8 E=(1025,312.5) cost=9239.13 score=9239.13
+candidate ring=2 A=-1003 B=7 C=8 D=0 E=(845.333,188.667) cost=2771.74 score=8315.22
+candidate ring=2 A=-1003 B=7 C=8 D=0 E=(820.238,179.762) cost=2318.18 score=6954.55
+reject inactive ring=2 A=5 B=6 C=7 D=8
+reject inactive ring=2 A=5 B=6 C=7 D=8
+reject inactive ring=0 A=3 B=4 C=5 D=6
+collapse ring=1 A=3 B=4 C=5 D=6 -> E=(428.571,214.286) cost=1500
+candidate ring=1 A=1 B=2 C=3 D=-1004 E=(379.412,529.412) cost=10253.2 score=10253.2
+candidate ring=1 A=1 B=2 C=3 D=-1004 E=(459.449,481.89) cost=7788.46 score=7788.46
+candidate ring=1 A=3 B=-1004 C=6 D=0 E=(369.231,115.385) cost=6377.95 score=6377.95
+candidate ring=1 A=-1004 B=6 C=0 D=1 E=(240,120) cost=4285.71 score=12857.1
+candidate ring=1 A=-1004 B=6 C=0 D=1 E=(200,143.75) cost=3913.04 score=11739.1
+reject inactive ring=2 A=6 B=7 C=8 D=0
+reject inactive ring=1 A=2 B=3 C=4 D=5
+reject inactive ring=1 A=3 B=4 C=5 D=6
+reject inactive ring=0 A=14 B=15 C=16 D=17
+reject inactive ring=0 A=14 B=15 C=16 D=17
+reject inactive ring=2 A=2 B=3 C=4 D=5
+reject inactive ring=2 A=3 B=4 C=5 D=6
+reject inactive ring=0 A=2 B=3 C=4 D=5
+reject inactive ring=2 A=4 B=5 C=6 D=7
+reject inactive ring=0 A=16 B=17 C=18 D=19
+collapse ring=2 A=0 B=-1000 C=3 D=4 -> E=(958.333,641.667) cost=2272.73
+candidate ring=2 A=7 B=8 C=0 D=-1005 E=(634.483,117.241) cost=17561 score=17561
+candidate ring=2 A=7 B=8 C=0 D=-1005 E=(652.308,236.923) cost=6371.68 score=6371.68
+candidate ring=2 A=0 B=-1005 C=4 D=-1003 E=(979.167,662.5) cost=1623.38 score=1623.38
+collapse ring=2 A=0 B=-1005 C=4 D=-1003 -> E=(979.167,662.5) cost=1623.38
+candidate ring=2 A=7 B=8 C=0 D=-1006 E=(627.933,113.966) cost=18406.4 score=18406.4
+candidate ring=2 A=7 B=8 C=0 D=-1006 E=(651.566,237.108) cost=6390.04 score=6390.04
+candidate ring=2 A=-1006 B=-1003 C=7 D=8 E=(1036.87,318.436) cost=10628.6 score=10628.6
+reject inactive ring=1 A=4 B=5 C=6 D=0
+collapse ring=0 A=14 B=15 C=-1001 D=18 -> E=(50,678.571) cost=2327.59
+candidate ring=0 A=12 B=13 C=14 D=-1007 E=(423.529,1038.24) cost=9000 score=9000
+candidate ring=0 A=12 B=13 C=14 D=-1007 E=(361.947,1017.26) cost=7697.37 score=7697.37
+candidate ring=0 A=13 B=14 C=-1007 D=18 E=(180,920) cost=18281.2 score=18281.2
+candidate ring=0 A=13 B=14 C=-1007 D=18 E=(80.2326,793.023) cost=13710.9 score=13710.9
+candidate ring=0 A=14 B=-1007 C=18 D=19 E=(-21.5361,600.904) cost=12308.1 score=12308.1
+candidate ring=0 A=14 B=-1007 C=18 D=19 E=(-89.7059,419.118) cost=19256.8 score=19256.8
+candidate ring=0 A=-1007 B=18 C=19 D=0 E=(-34.6715,358.029) cost=3071.12 score=3071.12
+candidate ring=0 A=-1007 B=18 C=19 D=0 E=(0,828.571) cost=33928.6 score=33928.6
+reject inactive ring=0 A=13 B=14 C=15 D=16
+reject inactive ring=2 A=6 B=7 C=8 D=0
+collapse ring=0 A=18 B=19 C=0 D=1 -> E=(26.087,-6.52174) cost=2571.43
+candidate ring=0 A=14 B=-1007 C=18 D=-1008 E=(-40.2045,580.635) cost=17277.7 score=17277.7
+candidate ring=0 A=14 B=-1007 C=18 D=-1008 E=(-82.767,432.004) cost=18563.3 score=18563.3
+candidate ring=0 A=-1007 B=18 C=-1008 D=1 E=(-88.5675,153.994) cost=15721 score=15721
+candidate ring=0 A=-1007 B=18 C=-1008 D=1 E=(-59.9483,14.9871) cost=17468.1 score=17468.1
+candidate ring=0 A=18 B=-1008 C=1 D=2 E=(37.5826,-52.8329) cost=5266.62 score=5266.62
+candidate ring=0 A=18 B=-1008 C=1 D=2 E=(78.7879,-80.303) cost=8705.11 score=8705.11
+candidate ring=0 A=-1008 B=1 C=2 D=-1002 E=(51.1628,-12.7907) cost=8205.13 score=8205.13
+candidate ring=0 A=-1008 B=1 C=2 D=-1002 E=(677.778,-41.6667) cost=9756.1 score=9756.1
+reject inactive ring=0 A=13 B=14 C=15 D=-1001
+reject inactive ring=1 A=4 B=5 C=6 D=0
+reject inactive ring=1 A=2 B=3 C=4 D=5
+collapse ring=0 A=9 B=10 C=11 D=12 -> E=(1060,790) cost=2857.14
+candidate ring=0 A=7 B=8 C=9 D=-1009 E=(920.588,1517.65) cost=111765 score=111765
+candidate ring=0 A=7 B=8 C=9 D=-1009 E=(1200,650) cost=7692.31 score=7692.31
+candidate ring=0 A=8 B=9 C=-1009 D=12 E=(1269,676) cost=13079.7 score=13079.7
+candidate ring=0 A=8 B=9 C=-1009 D=12 E=(1196.8,748.2) cost=13079.7 score=13079.7
+candidate ring=0 A=9 B=-1009 C=12 D=13 E=(1100,750) cost=5833.33 score=5833.33
+candidate ring=0 A=9 B=-1009 C=12 D=13 E=(2600,-50) cost=133000 score=133000
+candidate ring=0 A=-1009 B=12 C=13 D=14 E=(284.615,1026.92) cost=16153.8 score=16153.8
+candidate ring=0 A=-1009 B=12 C=13 D=14 E=(460,990) cost=4200 score=4200
+reject inactive ring=0 A=-1007 B=18 C=19 D=0
+reject inactive ring=0 A=-1001 B=18 C=19 D=0
+reject inactive ring=0 A=17 B=18 C=19 D=0
+reject inactive ring=1 A=5 B=6 C=0 D=1
+reject inactive ring=0 A=9 B=10 C=11 D=12
+reject inactive ring=0 A=14 B=15 C=-1001 D=18
+reject inactive ring=2 A=3 B=4 C=5 D=6
+reject inactive ring=0 A=11 B=12 C=13 D=14
+reject inactive ring=2 A=-1000 B=3 C=4 D=5
+collapse ring=0 A=-1009 B=12 C=13 D=14 -> E=(460,990) cost=4200
+candidate ring=0 A=8 B=9 C=-1009 D=-1010 E=(1271.41,685.634) cost=16044.4 score=16044.4
+candidate ring=0 A=8 B=9 C=-1009 D=-1010 E=(1198.35,743.883) cost=12801.4 score=12801.4
+candidate ring=0 A=9 B=-1009 C=-1010 D=14 E=(966.667,883.333) cost=22400 score=22400
+candidate ring=0 A=9 B=-1009 C=-1010 D=14 E=(589.362,1022.34) cost=28373.3 score=28373.3
+candidate ring=0 A=-1009 B=-1010 C=14 D=-1007 E=(385.399,1014.87) cost=5762.53 score=5762.53
+candidate ring=0 A=-1009 B=-1010 C=14 D=-1007 E=(356.845,1011.72) cost=6692.54 score=6692.54
+candidate ring=0 A=-1010 B=14 C=-1007 D=18 E=(180,920) cost=18281.2 score=18281.2
+candidate ring=0 A=-1010 B=14 C=-1007 D=18 E=(76.943,780.57) cost=11778.5 score=11778.5
+reject inactive ring=0 A=13 B=14 C=15 D=16
+reject inactive ring=0 A=13 B=14 C=15 D=-1001
+reject inactive ring=1 A=5 B=6 C=0 D=1
+reject inactive ring=2 A=7 B=8 C=0 D=-1000
+reject inactive ring=2 A=7 B=8 C=0 D=1
+reject inactive ring=0 A=8 B=9 C=10 D=11
+collapse ring=1 A=0 B=1 C=2 D=3 -> E=(247.059,467.647) cost=4800
+candidate ring=1 A=-1004 B=6 C=0 D=-1011 E=(215.385,107.692) cost=6556.29 score=32781.5
+candidate ring=1 A=-1004 B=6 C=0 D=-1011 E=(190,143.125) cost=4177.22 score=20886.1
+candidate ring=1 A=0 B=-1011 C=3 D=-1004 E=(479.237,653.39) cost=27687.4 score=27687.4
+reject inactive ring=1 A=6 B=0 C=1 D=2
+reject inactive ring=0 A=10 B=11 C=12 D=13
+reject inactive ring=1 A=6 B=0 C=1 D=2
+reject inactive ring=0 A=10 B=11 C=12 D=13
+collapse ring=0 A=18 B=-1008 C=1 D=2 -> E=(37.5826,-52.8329) cost=5266.62
+candidate ring=0 A=14 B=-1007 C=18 D=-1012 E=(-45.33,575.07) cost=18704.6 score=18704.6
+candidate ring=0 A=14 B=-1007 C=18 D=-1012 E=(-82.767,432.004) cost=18563.3 score=18563.3
+candidate ring=0 A=-1007 B=18 C=-1012 D=2 E=(-116.132,49.6435) cost=33736.4 score=33736.4
+candidate ring=0 A=-1007 B=18 C=-1012 D=2 E=(-56.2224,-66.5077) cost=22846.7 score=22846.7
+candidate ring=0 A=18 B=-1012 C=2 D=-1002 E=(27.3709,-11.6943) cost=9474.8 score=9474.8
+candidate ring=0 A=18 B=-1012 C=2 D=-1002 E=(-169.892,85.4839) cost=61089.9 score=61089.9
+candidate ring=0 A=-1012 B=2 C=-1002 D=5 E=(-454.075,-124.506) cost=20589.4 score=20589.4
+candidate ring=0 A=-1012 B=2 C=-1002 D=5 E=(840.595,13.8273) cost=10464.9 score=10464.9
+reject inactive ring=0 A=1 B=2 C=3 D=4
+reject inactive ring=1 A=0 B=1 C=2 D=3
+collapse ring=0 A=-1009 B=-1010 C=14 D=-1007 -> E=(385.399,1014.87) cost=5762.53
+candidate ring=0 A=8 B=9 C=-1009 D=-1013 E=(1272.06,688.245) cost=16830.3 score=16830.3
+candidate ring=0 A=8 B=9 C=-1009 D=-1013 E=(1198.35,743.883) cost=12801.4 score=12801.4
+candidate ring=0 A=9 B=-1009 C=-1013 D=-1007 E=(790.446,1059.55) cost=86527.2 score=86527.2
+candidate ring=0 A=9 B=-1009 C=-1013 D=-1007 E=(452.063,1081.71) cost=35277.8 score=35277.8
+candidate ring=0 A=-1009 B=-1013 C=-1007 D=18 E=(276.86,1051.05) cost=31975.1 score=31975.1
+candidate ring=0 A=-1009 B=-1013 C=-1007 D=18 E=(131.432,986.848) cost=60737.8 score=60737.8
+candidate ring=0 A=-1013 B=-1007 C=18 D=-1012 E=(-45.1933,583.123) cost=19099.4 score=19099.4
+candidate ring=0 A=-1013 B=-1007 C=18 D=-1012 E=(-87.8074,452.31) cost=22441 score=22441
+reject inactive ring=0 A=9 B=-1009 C=12 D=13
+reject inactive ring=1 A=1 B=2 C=3 D=4
+reject inactive ring=2 A=7 B=8 C=0 D=-1005
+collapse ring=1 A=3 B=-1004 C=6 D=0 -> E=(369.231,115.385) cost=6377.95
+candidate ring=1 A=0 B=-1011 C=3 D=-1014 E=(307.438,811.054) cost=34046.8 score=34046.8
+candidate ring=1 A=3 B=-1014 C=0 D=-1011 E=(154.987,-56.0102) cost=25381.9 score=25381.9
+collapse ring=2 A=7 B=8 C=0 D=-1006 -> E=(651.566,237.108) cost=6390.04
+candidate ring=2 A=-1006 B=-1003 C=7 D=-1015 E=(1024.98,256.485) cost=14923.4 score=14923.4
+reject inactive ring=0 A=12 B=13 C=14 D=15
+reject inactive ring=0 A=19 B=0 C=1 D=2
+reject inactive ring=2 A=7 B=8 C=0 D=-1000
+reject inactive ring=2 A=7 B=8 C=0 D=1
+reject inactive ring=0 A=3 B=4 C=5 D=6
+reject inactive ring=0 A=-1009 B=-1010 C=14 D=-1007
+reject inactive ring=2 A=-1000 B=3 C=4 D=5
+collapse ring=0 A=5 B=6 C=7 D=8 -> E=(1250,-12.5) cost=6938.78
+candidate ring=0 A=2 B=-1002 C=5 D=-1016 E=(243.478,23.4783) cost=24313.7 score=24313.7
+candidate ring=0 A=2 B=-1002 C=5 D=-1016 E=(1160,10) cost=15030.3 score=15030.3
+candidate ring=0 A=-1002 B=5 C=-1016 D=8 E=(1328.28,124.495) cost=39141.4 score=39141.4
+candidate ring=0 A=-1002 B=5 C=-1016 D=8 E=(1241.4,58.4628) cost=12390.1 score=12390.1
+candidate ring=0 A=5 B=-1016 C=8 D=9 E=(1200,0) cost=12098.8 score=12098.8
+candidate ring=0 A=5 B=-1016 C=8 D=9 E=(977.778,-488.889) cost=136111 score=136111
+candidate ring=0 A=-1016 B=8 C=9 D=-1009 E=(1137.91,912.255) cost=38031 score=38031
+candidate ring=0 A=-1016 B=8 C=9 D=-1009 E=(1200,650) cost=8876.81 score=8876.81
+reject inactive ring=0 A=4 B=5 C=6 D=7
+reject inactive ring=2 A=-1003 B=7 C=8 D=0
+reject inactive ring=2 A=-1000 B=3 C=4 D=-1003
+reject inactive ring=0 A=0 B=1 C=2 D=3
+reject inactive ring=1 A=1 B=2 C=3 D=4
+reject inactive ring=0 A=8 B=9 C=10 D=11
+reject inactive ring=0 A=12 B=13 C=14 D=15
+reject inactive ring=0 A=7 B=8 C=9 D=-1009
+reject inactive ring=0 A=7 B=8 C=9 D=10
+reject inactive ring=0 A=12 B=13 C=14 D=-1007
+reject inactive ring=1 A=1 B=2 C=3 D=-1004
+reject inactive ring=0 A=15 B=-1001 C=18 D=19
+reject inactive ring=0 A=0 B=1 C=2 D=-1002
+reject inactive ring=0 A=-1008 B=1 C=2 D=-1002
+reject inactive ring=2 A=-1003 B=7 C=8 D=0
+reject inactive ring=0 A=19 B=0 C=1 D=2
+reject inactive ring=0 A=18 B=-1008 C=1 D=2
+collapse ring=0 A=-1016 B=8 C=9 D=-1009 -> E=(1200,650) cost=8876.81
+candidate ring=0 A=-1002 B=5 C=-1016 D=-1017 E=(1293,116.488) cost=34934.1 score=34934.1
+candidate ring=0 A=-1002 B=5 C=-1016 D=-1017 E=(1244.64,58.5763) cost=12509.3 score=12509.3
+candidate ring=0 A=5 B=-1016 C=-1017 D=-1009 E=(1363.58,-40.894) cost=39670.8 score=39670.8
+candidate ring=0 A=5 B=-1016 C=-1017 D=-1009 E=(1403.12,446.875) cost=70464.6 score=70464.6
+candidate ring=0 A=-1016 B=-1017 C=-1009 D=-1013 E=(1193.96,729.997) cost=8892.02 score=8892.02
+candidate ring=0 A=-1016 B=-1017 C=-1009 D=-1013 E=(1176.01,751.33) cost=9613.61 score=9613.61
+candidate ring=0 A=-1017 B=-1009 C=-1013 D=-1007 E=(790.446,1059.55) cost=86527.2 score=86527.2
+candidate ring=0 A=-1017 B=-1009 C=-1013 D=-1007 E=(438.682,1068.29) cost=27243.8 score=27243.8
+collapse ring=0 A=-1016 B=-1017 C=-1009 D=-1013 -> E=(1193.96,729.997) cost=8892.02
+candidate ring=0 A=-1002 B=5 C=-1016 D=-1018 E=(1286.36,114.982) cost=34143.3 score=34143.3
+candidate ring=0 A=-1002 B=5 C=-1016 D=-1018 E=(1244.64,58.5763) cost=12509.3 score=12509.3
+candidate ring=0 A=5 B=-1016 C=-1018 D=-1013 E=(1970.39,-192.598) cost=276497 score=276497
+candidate ring=0 A=5 B=-1016 C=-1018 D=-1013 E=(1437.33,644.254) cost=89477.6 score=89477.6
+candidate ring=0 A=-1016 B=-1018 C=-1013 D=-1007 E=(1169.8,1050.13) cost=149473 score=149473
+candidate ring=0 A=-1016 B=-1018 C=-1013 D=-1007 E=(693.902,1324.2) cost=214142 score=214142
+candidate ring=0 A=-1018 B=-1013 C=-1007 D=18 E=(277.894,1052.74) cost=32070.7 score=32070.7
+candidate ring=0 A=-1018 B=-1013 C=-1007 D=18 E=(135.87,1003.65) cost=65800.4 score=65800.4

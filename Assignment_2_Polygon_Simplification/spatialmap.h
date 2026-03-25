@@ -28,5 +28,6 @@ private:
 public:
     void buildIndex(const Polygon& poly);
     bool isTopologyValid(Vertex* A, Vertex* B, Vertex* C, Vertex* D, Vertex* E);
+    int countInactiveOriginalCrossings(Vertex* A, Vertex* B, Vertex* C, Vertex* D, Vertex* E);
     void updateIndex(Vertex* A, Vertex* D, Vertex* E);
 };
