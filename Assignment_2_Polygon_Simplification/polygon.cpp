@@ -146,7 +146,7 @@ void Polygon::printToCSV() const {
     // Print the header exactly as requested
     std::cout << "ring_id,vertex_id,x,y\n";
     
-    std::cout << std::fixed << std::setprecision(3);
+    std::cout << std::defaultfloat << std::setprecision(10);
 
     for (const auto& ring : rings) {
         ring.printToCSV();
