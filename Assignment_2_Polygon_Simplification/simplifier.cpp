@@ -1,5 +1,18 @@
 #include "simplifier.h"
 #include "geometry.h"
+#include <cstdlib>
+
+namespace {
+bool isTraceEnabled() {
+    const char* value = std::getenv("APSC_TRACE");
+    return value != nullptr && value[0] != '\0' && value[0] != '0';
+}
+
+bool isCandidateTraceEnabled() {
+    const char* value = std::getenv("APSC_TRACE_CANDIDATES");
+    return value != nullptr && value[0] != '\0' && value[0] != '0';
+}
+}
 
 void Simplifier::evaluateAndPush(Vertex* A) {
     if (!A || !A->isActive) return;
@@ -15,7 +28,8 @@ void Simplifier::evaluateAndPush(Vertex* A) {
     std::vector<Vertex*> possible_Es = Geometry::calculateE(A, B, C, D);
 
     // Evaluate the displacement cost for each and push them to the PQ
-    for (Vertex* E : possible_Es) {
+    for (int i = 0; i < static_cast<int>(possible_Es.size()); ++i) {
+        Vertex* E = possible_Es[i];
         CollapseCandidate candidate;
         candidate.A = A;
         candidate.B = B;
@@ -23,6 +37,17 @@ void Simplifier::evaluateAndPush(Vertex* A) {
         candidate.D = D;
         candidate.E = E;
         candidate.cost = Geometry::calculateDisplacementCost(A, B, C, D, E);
+        candidate.candidateRank = i;
+
+        if (isCandidateTraceEnabled()) {
+            std::cerr << "candidate ring=" << A->ring_id
+                      << " A=" << A->id
+                      << " B=" << B->id
+                      << " C=" << C->id
+                      << " D=" << D->id
+                      << " E=(" << E->x << "," << E->y << ")"
+                      << " cost=" << candidate.cost << "\n";
+        }
 
         pq.push(candidate);
     }
@@ -63,6 +88,13 @@ void Simplifier::run(int targetVertices)
 
         // 1. LAZY DELETION CHECK: Are all 4 vertices still part of the polygon?
         if (!best.A->isActive || !best.B->isActive || !best.C->isActive || !best.D->isActive) {
+            if (isCandidateTraceEnabled()) {
+                std::cerr << "reject inactive ring=" << best.A->ring_id
+                          << " A=" << best.A->id
+                          << " B=" << best.B->id
+                          << " C=" << best.C->id
+                          << " D=" << best.D->id << "\n";
+            }
             // One of these was already removed in a previous collapse. 
             // Discard this candidate and move to the next one.
             delete best.E; // Clean up the memory we allocated for the proposed E
@@ -74,12 +106,27 @@ void Simplifier::run(int targetVertices)
         // collapses. Those candidates must not be applied.
         if (best.A->next != best.B || best.B->next != best.C || best.C->next != best.D ||
             best.B->prev != best.A || best.C->prev != best.B || best.D->prev != best.C) {
+            if (isCandidateTraceEnabled()) {
+                std::cerr << "reject stale ring=" << best.A->ring_id
+                          << " A=" << best.A->id
+                          << " B=" << best.B->id
+                          << " C=" << best.C->id
+                          << " D=" << best.D->id << "\n";
+            }
             delete best.E;
             continue;
         }
 
         // 2. TOPOLOGY CHECK: Does this move break the shape?
         if (!spatialMap.isTopologyValid(best.A, best.B, best.C, best.D, best.E)) {
+            if (isCandidateTraceEnabled()) {
+                std::cerr << "reject topology ring=" << best.A->ring_id
+                          << " A=" << best.A->id
+                          << " B=" << best.B->id
+                          << " C=" << best.C->id
+                          << " D=" << best.D->id
+                          << " E=(" << best.E->x << "," << best.E->y << ")\n";
+            }
             // It intersects something! Discard it.
             delete best.E;
             continue; 
@@ -101,10 +148,19 @@ void Simplifier::run(int targetVertices)
 
         totalDisplacement += best.cost;
 
+        if (isTraceEnabled()) {
+            std::cerr << "collapse ring=" << best.A->ring_id
+                      << " A=" << best.A->id
+                      << " B=" << best.B->id
+                      << " C=" << best.C->id
+                      << " D=" << best.D->id
+                      << " -> E=(" << best.E->x << "," << best.E->y << ")"
+                      << " cost=" << best.cost << "\n";
+        }
+
         // 4. LOCAL UPDATES ONLY
         // We only need to recalculate the costs for the sequences immediately 
         // surrounding our new vertex E. 
-        // Note: You'll need to write evaluateAndPush to calculate the math and push to the queue.
         evaluateAndPush(best.A->prev->prev); // Sequence starting two before A
         evaluateAndPush(best.A->prev);       // Sequence starting one before A
         evaluateAndPush(best.A);             // Sequence starting at A
