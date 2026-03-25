@@ -1,6 +1,5 @@
 #include "spatialmap.h"
 
-
 // --- Helper Math: Checks if two line segments cross ---
 int SpatialMap::orientation(Vertex* p, Vertex* q, Vertex* r) {
     double val = (q->y - p->y) * (r->x - q->x) - (q->x - p->x) * (r->y - q->y);
@@ -105,7 +104,7 @@ bool SpatialMap::isTopologyValid(Vertex* A, Vertex* B, Vertex* C, Vertex* D, Ver
         for (const auto& segment : grid[cell]) {
             // Ignore inactive segments
             if (!segment.first->isActive || !segment.second->isActive) continue;
-            
+
             // ADDED: Ignore the segments we are actively trying to collapse!
             if (segment.first == A && segment.second == B) continue;
             if (segment.first == B && segment.second == C) continue;

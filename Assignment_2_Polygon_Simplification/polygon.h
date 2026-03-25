@@ -10,12 +10,13 @@ struct Vertex {
     int id;
     int ring_id;
     double x, y;
+    int evalVersion;
     Vertex* prev;
     Vertex* next;
     bool isActive;                                      // For lazy deletion
 
     Vertex(int _id, int _ring_id, double _x, double _y) 
-        : id(_id), ring_id(_ring_id), x(_x), y(_y), prev(nullptr), next(nullptr), isActive(true) {}
+        : id(_id), ring_id(_ring_id), x(_x), y(_y), evalVersion(0), prev(nullptr), next(nullptr), isActive(true) {}
 };
 
 struct Ring {

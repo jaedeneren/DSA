@@ -24,6 +24,8 @@ void Simplifier::evaluateAndPush(Vertex* A) {
     if (!B->isActive || !C->isActive || !D->isActive) return;
     if (A == C || A == D) return; // Skip if ring is too small
 
+    ++A->evalVersion;
+
     // Get ALL valid geometric candidates
     std::vector<Vertex*> possible_Es = Geometry::calculateE(A, B, C, D);
 
@@ -38,6 +40,7 @@ void Simplifier::evaluateAndPush(Vertex* A) {
         candidate.E = E;
         candidate.cost = Geometry::calculateDisplacementCost(A, B, C, D, E);
         candidate.candidateRank = i;
+        candidate.evalVersion = A->evalVersion;
 
         if (isCandidateTraceEnabled()) {
             std::cerr << "candidate ring=" << A->ring_id
@@ -99,6 +102,18 @@ void Simplifier::run(int targetVertices)
             // Discard this candidate and move to the next one.
             delete best.E; // Clean up the memory we allocated for the proposed E
             continue; 
+        }
+
+        if (best.evalVersion != best.A->evalVersion) {
+            if (isCandidateTraceEnabled()) {
+                std::cerr << "reject superseded ring=" << best.A->ring_id
+                          << " A=" << best.A->id
+                          << " B=" << best.B->id
+                          << " C=" << best.C->id
+                          << " D=" << best.D->id << "\n";
+            }
+            delete best.E;
+            continue;
         }
 
         // 1b. STALE CANDIDATE CHECK: the queue can still contain candidates
