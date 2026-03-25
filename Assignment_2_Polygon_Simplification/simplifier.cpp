@@ -3,6 +3,8 @@
 #include <cstdlib>
 
 namespace {
+constexpr double kSyntheticInteriorCrossingPenalty = 2.0;
+
 bool isTraceEnabled() {
     const char* value = std::getenv("APSC_TRACE");
     return value != nullptr && value[0] != '\0' && value[0] != '0';
@@ -23,6 +25,7 @@ void Simplifier::evaluateAndPush(Vertex* A) {
 
     if (!B->isActive || !C->isActive || !D->isActive) return;
     if (A == C || A == D) return; // Skip if ring is too small
+    if (A->ring_id != 0 && C->id < 0) return;
 
     ++A->evalVersion;
 
@@ -39,6 +42,11 @@ void Simplifier::evaluateAndPush(Vertex* A) {
         candidate.D = D;
         candidate.E = E;
         candidate.cost = Geometry::calculateDisplacementCost(A, B, C, D, E);
+        candidate.priorityCost = candidate.cost;
+        int inactiveCrossings = spatialMap.countInactiveOriginalCrossings(A, B, C, D, E);
+        if (inactiveCrossings > 0) {
+            candidate.priorityCost *= (1.0 + kSyntheticInteriorCrossingPenalty * inactiveCrossings);
+        }
         candidate.candidateRank = i;
         candidate.evalVersion = A->evalVersion;
 
@@ -49,7 +57,8 @@ void Simplifier::evaluateAndPush(Vertex* A) {
                       << " C=" << C->id
                       << " D=" << D->id
                       << " E=(" << E->x << "," << E->y << ")"
-                      << " cost=" << candidate.cost << "\n";
+                      << " cost=" << candidate.cost
+                      << " score=" << candidate.priorityCost << "\n";
         }
 
         pq.push(candidate);
