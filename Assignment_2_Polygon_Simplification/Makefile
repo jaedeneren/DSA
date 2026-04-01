@@ -3,7 +3,7 @@ CXXFLAGS = -std=c++17 -Wall -Wextra -O3
 SRC_DIR = .
 OBJ_DIR = obj
 
-# Find all .cpp files in src/
+# The list of objects now explicitly includes the new visualization component
 SOURCES = $(wildcard $(SRC_DIR)/*.cpp)
 OBJECTS = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SOURCES))
 EXECUTABLE = simplify

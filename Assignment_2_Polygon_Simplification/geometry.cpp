@@ -84,6 +84,7 @@ std::vector<Vertex*> Geometry::calculateE(Vertex* A, Vertex* B, Vertex* C, Verte
     bool useInteriorPlacementRule = A->ring_id != 0 && B->id < 0;
 
     if (useInteriorPlacementRule && (eOnAB || eOnCD)) {
+        // ... (Keep your existing interior placement rule logic exactly as it is) ...
         Vertex* chosen = nullptr;
 
         if (!eOnAB || !eOnCD) {
@@ -112,29 +113,38 @@ std::vector<Vertex*> Geometry::calculateE(Vertex* A, Vertex* B, Vertex* C, Verte
             }
         }
 
-        if (chosen) {
-            candidates.push_back(chosen);
-        }
-        if (eOnAB && eOnAB != chosen) {
-            delete eOnAB;
-        }
-        if (eOnCD && eOnCD != chosen) {
-            delete eOnCD;
-        }
-        if (candidates.empty()) {
-            candidates.push_back(new Vertex(-1, A->ring_id, B->x, B->y));
-        }
+        if (chosen) candidates.push_back(chosen);
+        if (eOnAB && eOnAB != chosen) delete eOnAB;
+        if (eOnCD && eOnCD != chosen) delete eOnCD;
+        if (candidates.empty()) candidates.push_back(new Vertex(-1, A->ring_id, B->x, B->y));
         return candidates;
     }
 
-    // Keep both valid area-preserving intersections and let the priority queue
-    // rank them. Several test cases depend on deterministic tie-breaking here.
+    // --- ENHANCEMENT: Keep valid intersections AND sample between them ---
     if (eOnAB) {
         candidates.push_back(eOnAB);
     }
-    if (eOnCD &&
-        (!eOnAB || std::abs(eOnCD->x - eOnAB->x) > kEpsilon || std::abs(eOnCD->y - eOnAB->y) > kEpsilon)) {
+    
+    if (eOnCD && (!eOnAB || std::abs(eOnCD->x - eOnAB->x) > kEpsilon || std::abs(eOnCD->y - eOnAB->y) > kEpsilon)) {
         candidates.push_back(eOnCD);
+    }
+
+    // If both bounding intersections exist, create interpolations on the area-preserving line
+    if (eOnAB && eOnCD) {
+        // Midpoint
+        candidates.push_back(new Vertex(-1, A->ring_id, 
+            (eOnAB->x + eOnCD->x) / 2.0, 
+            (eOnAB->y + eOnCD->y) / 2.0));
+            
+        // 25% Mark
+        candidates.push_back(new Vertex(-1, A->ring_id, 
+            eOnAB->x * 0.75 + eOnCD->x * 0.25, 
+            eOnAB->y * 0.75 + eOnCD->y * 0.25));
+            
+        // 75% Mark
+        candidates.push_back(new Vertex(-1, A->ring_id, 
+            eOnAB->x * 0.25 + eOnCD->x * 0.75, 
+            eOnAB->y * 0.25 + eOnCD->y * 0.75));
     }
 
     if (candidates.empty()) {
