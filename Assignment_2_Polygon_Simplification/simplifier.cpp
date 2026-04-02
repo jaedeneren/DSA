@@ -148,5 +148,12 @@ void Simplifier::run(int targetVertices)
         evaluateAndPush(best.A->prev);       
         evaluateAndPush(best.A);             
         evaluateAndPush(best.E);             
+
+        if (best.E->next && best.E->next->isActive) {
+            evaluateAndPush(best.E->next);
+        }
+        if (best.E->next && best.E->next->next && best.E->next->next->isActive) {
+            evaluateAndPush(best.E->next->next);
+        }
     }
 }
