@@ -3,8 +3,8 @@
 #include <cstdlib>
 
 namespace {
-constexpr double kDefaultSyntheticStartPenalty = 0.0;
-constexpr double kDefaultInterpolatedCandidatePenalty = 0.25;
+constexpr double kDefaultSyntheticStartPenalty = 0.4;
+constexpr double kDefaultInterpolatedCandidatePenalty = 0.23;
 
 double getSyntheticStartPenalty() {
     static const double penalty = [] {
