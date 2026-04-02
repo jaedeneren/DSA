@@ -3,6 +3,45 @@
 #include <cstdlib>
 
 namespace {
+constexpr double kDefaultSyntheticStartPenalty = 0.0;
+constexpr double kDefaultInterpolatedCandidatePenalty = 0.25;
+
+double getSyntheticStartPenalty() {
+    static const double penalty = [] {
+        const char* value = std::getenv("APSC_SYNTHETIC_START_PENALTY");
+        if (!value || value[0] == '\0') {
+            return kDefaultSyntheticStartPenalty;
+        }
+
+        char* end = nullptr;
+        double parsed = std::strtod(value, &end);
+        if (end == value || !std::isfinite(parsed)) {
+            return kDefaultSyntheticStartPenalty;
+        }
+        return std::max(0.0, parsed);
+    }();
+
+    return penalty;
+}
+
+double getInterpolatedCandidatePenalty() {
+    static const double penalty = [] {
+        const char* value = std::getenv("APSC_INTERPOLATED_CANDIDATE_PENALTY");
+        if (!value || value[0] == '\0') {
+            return kDefaultInterpolatedCandidatePenalty;
+        }
+
+        char* end = nullptr;
+        double parsed = std::strtod(value, &end);
+        if (end == value || !std::isfinite(parsed)) {
+            return kDefaultInterpolatedCandidatePenalty;
+        }
+        return std::max(0.0, parsed);
+    }();
+
+    return penalty;
+}
+
 bool isTraceEnabled() {
     const char* value = std::getenv("APSC_TRACE");
     return value != nullptr && value[0] != '\0' && value[0] != '0';
@@ -42,7 +81,14 @@ void Simplifier::evaluateAndPush(Vertex* A) {
         
         // Use pure displacement cost for the greedy choice to minimize areal displacement
         candidate.cost = Geometry::calculateDisplacementCost(A, B, C, D, E);
-        candidate.priorityCost = candidate.cost; 
+        candidate.priorityCost = candidate.cost;
+        if (A->id < 0) {
+            candidate.priorityCost *= (1.0 + getSyntheticStartPenalty());
+        }
+        if (i >= 2) {
+            candidate.priorityCost *= (1.0 + getInterpolatedCandidatePenalty());
+        }
+
         candidate.candidateRank = i;
         candidate.evalVersion = A->evalVersion;
 
