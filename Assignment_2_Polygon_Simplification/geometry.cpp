@@ -183,7 +183,7 @@ double Geometry::calculateDisplacementCost(Vertex* A, Vertex* B, Vertex* C, Vert
                 y_int >= std::min(by, cy) - 1e-4 && y_int <= std::max(by, cy) + 1e-4 &&
                 x_int >= std::min(ex, dx) - 1e-4 && x_int <= std::max(ex, dx) + 1e-4 &&
                 y_int >= std::min(ey, dy) - 1e-4 && y_int <= std::max(ey, dy) + 1e-4) {
-                return 2.0 * triangleArea(cx, cy, dx, dy, x_int, y_int);
+                return triangleArea(cx, cy, dx, dy, x_int, y_int);
             }
         }
     } else {
@@ -200,7 +200,7 @@ double Geometry::calculateDisplacementCost(Vertex* A, Vertex* B, Vertex* C, Vert
                 y_int >= std::min(by, cy) - 1e-4 && y_int <= std::max(by, cy) + 1e-4 &&
                 x_int >= std::min(ex, 0.0) - 1e-4 && x_int <= std::max(ex, 0.0) + 1e-4 &&
                 y_int >= std::min(ey, 0.0) - 1e-4 && y_int <= std::max(ey, 0.0) + 1e-4) {
-                return 2.0 * triangleArea(0.0, 0.0, bx, by, x_int, y_int);
+                return triangleArea(0.0, 0.0, bx, by, x_int, y_int);
             }
         }
     }
