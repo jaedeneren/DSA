@@ -14,7 +14,7 @@ struct CellHash {
 
 class SpatialMap {
 private:
-    double cellSize = 500.0; // Grid cell size. Tune this based on your dataset!
+    double cellSize;
     
     // The Spatial Grid: Maps a Grid Coordinate (X, Y) to a list of Line Segments
     std::unordered_map<std::pair<int, int>, std::vector<std::pair<Vertex*, Vertex*>>, CellHash> grid;

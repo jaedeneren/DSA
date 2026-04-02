@@ -83,14 +83,37 @@ std::vector<std::pair<int, int>> SpatialMap::getCellsForSegment(Vertex* v1, Vert
 
 void SpatialMap::buildIndex(const Polygon& poly) {
     grid.clear();
+    
+    // --- 1. NEW: Calculate Dynamic Cell Size ---
+    double totalLength = 0.0;
+    int segmentCount = 0;
+    
     for (const auto& ring : poly.rings) {
         if (ring.vertexCount < 2) continue;
-        
         Vertex* current = ring.head;
         do {
             if (current->isActive) {
                 Vertex* nextV = current->next;
-                // Note: assuming initial polygon has no inactive vertices yet
+                totalLength += std::hypot(nextV->x - current->x, nextV->y - current->y);
+                segmentCount++;
+            }
+            current = current->next;
+        } while (current != ring.head);
+    }
+    
+    // Set cell size to 2.0x the average segment length. 
+    // Fallback to 0.1 if segments are practically zero-length.
+    cellSize = (segmentCount > 0) ? (totalLength / segmentCount) * 2.0 : 0.1;
+    if (cellSize < 1e-6) cellSize = 0.1; 
+    // -----------------------------------------
+
+    // --- 2. Existing insertion logic ---
+    for (const auto& ring : poly.rings) {
+        if (ring.vertexCount < 2) continue;
+        Vertex* current = ring.head;
+        do {
+            if (current->isActive) {
+                Vertex* nextV = current->next;
                 auto cells = getCellsForSegment(current, nextV);
                 for (const auto& cell : cells) {
                     grid[cell].push_back({current, nextV});
@@ -102,20 +125,32 @@ void SpatialMap::buildIndex(const Polygon& poly) {
 }
 
 bool SpatialMap::isTopologyValid(Vertex* A, Vertex* B, Vertex* C, Vertex* D, Vertex* E) {
-    // We only need to check the cells that the new segments AE and ED will touch!
     auto cellsAE = getCellsForSegment(A, E);
     auto cellsED = getCellsForSegment(E, D);
     
-    // Combine them to check all relevant local segments
     std::vector<std::pair<int, int>> cellsToCheck = cellsAE;
     cellsToCheck.insert(cellsToCheck.end(), cellsED.begin(), cellsED.end());
 
     for (const auto& cell : cellsToCheck) {
-        for (const auto& segment : grid[cell]) {
-            // Ignore inactive segments
-            if (!segment.first->isActive || !segment.second->isActive) continue;
+        // 1. Grab the vector by reference so we can modify it
+        auto& cellSegments = grid[cell]; 
+        
+        // 2. NEW: Lazy Purge (Erase-Remove Idiom)
+        // This permanently strips out any segment where either vertex is inactive
+        cellSegments.erase(
+            std::remove_if(cellSegments.begin(), cellSegments.end(),
+                [](const std::pair<Vertex*, Vertex*>& segment) {
+                    return !segment.first->isActive || !segment.second->isActive;
+                }), 
+            cellSegments.end()
+        );
 
-            // ADDED: Ignore the segments we are actively trying to collapse!
+        // 3. Now iterate over the clean, purged list
+        for (const auto& segment : cellSegments) {
+            // (You can delete your old `if (!segment.first->isActive...)` check here, 
+            // because they are already gone!)
+
+            // Ignore the segments we are actively trying to collapse
             if (segment.first == A && segment.second == B) continue;
             if (segment.first == B && segment.second == C) continue;
             if (segment.first == C && segment.second == D) continue;
@@ -125,7 +160,7 @@ bool SpatialMap::isTopologyValid(Vertex* A, Vertex* B, Vertex* C, Vertex* D, Ver
             if (checkIntersection(E, D, segment.first, segment.second)) return false;
         }
     }
-    return true; // Safe to collapse!
+    return true; 
 }
 
 int SpatialMap::countInactiveOriginalCrossings(Vertex* A, Vertex* B, Vertex* C, Vertex* D, Vertex* E) {
