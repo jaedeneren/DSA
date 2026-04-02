@@ -17,6 +17,9 @@ int main(int argc, char* argv[]) {
     Polygon poly;
     poly.loadFromCSV(filename.c_str());
 
+    Polygon originalPoly;
+    originalPoly.loadFromCSV(filename.c_str());
+
     // 1. Calculate area BEFORE simplification
     double initialArea = Geometry::calculateTotalArea(poly);
 
@@ -27,10 +30,14 @@ int main(int argc, char* argv[]) {
     // 2. Calculate area AFTER simplification
     double finalArea = Geometry::calculateTotalArea(poly);
 
-    // 3. Print the vertices
+    // 3. Report the actual displacement between input and final output,
+    // not the sum of intermediate greedy collapse costs.
+    simplifier.totalDisplacement = Geometry::calculateSymmetricDifferenceArea(originalPoly, poly);
+
+    // 4. Print the vertices
     poly.printToCSV();
 
-    // 4. Print the required summary in scientific notation
+    // 5. Print the required summary in scientific notation
     std::cout << std::scientific << std::setprecision(6);
     std::cout << "Total signed area in input: " << initialArea << "\n";
     std::cout << "Total signed area in output: " << finalArea << "\n";

@@ -6,6 +6,26 @@
 namespace {
 constexpr double kEpsilon = 1e-12;
 
+struct Point2D {
+    double x;
+    double y;
+};
+
+struct Segment2D {
+    Point2D start;
+    Point2D end;
+};
+
+using Interval = std::pair<double, double>;
+
+Point2D subtract(const Point2D& lhs, const Point2D& rhs) {
+    return {lhs.x - rhs.x, lhs.y - rhs.y};
+}
+
+double cross(const Point2D& lhs, const Point2D& rhs) {
+    return lhs.x * rhs.y - lhs.y * rhs.x;
+}
+
 double signedLineValue(double ax, double ay, double dx, double dy, double px, double py) {
     return (dx - ax) * (py - ay) - (dy - ay) * (px - ax);
 }
@@ -40,6 +60,204 @@ Vertex* intersectLines(
     double xRel = (b1 * c2 - b2 * c1) / det;
     double yRel = (a2 * c1 - a1 * c2) / det;
     return new Vertex(-1, ringId, xRel + A->x, yRel + A->y);
+}
+
+void appendRingSegments(const Ring& ring, std::vector<Segment2D>& output, std::vector<double>& xEvents) {
+    if (!ring.head || ring.vertexCount < 2) {
+        return;
+    }
+
+    Vertex* current = ring.head;
+    do {
+        if (current->isActive) {
+            Vertex* next = current->next;
+            while (!next->isActive && next != ring.head) {
+                next = next->next;
+            }
+
+            if (next != current) {
+                output.push_back({{current->x, current->y}, {next->x, next->y}});
+                xEvents.push_back(current->x);
+            }
+        }
+        current = current->next;
+    } while (current != ring.head);
+}
+
+std::vector<Segment2D> collectSegments(const Polygon& poly, std::vector<double>& xEvents) {
+    std::vector<Segment2D> segments;
+    for (const auto& ring : poly.rings) {
+        appendRingSegments(ring, segments, xEvents);
+    }
+    return segments;
+}
+
+void sortAndUnique(std::vector<double>& values) {
+    std::sort(values.begin(), values.end());
+    values.erase(std::unique(values.begin(), values.end(), [](double lhs, double rhs) {
+        return std::abs(lhs - rhs) <= 1e-9;
+    }), values.end());
+}
+
+bool segmentIntersectionX(const Segment2D& lhs, const Segment2D& rhs, double& xIntersection) {
+    Point2D p = lhs.start;
+    Point2D q = rhs.start;
+    Point2D r = subtract(lhs.end, lhs.start);
+    Point2D s = subtract(rhs.end, rhs.start);
+
+    double denominator = cross(r, s);
+    Point2D qp = subtract(q, p);
+
+    if (std::abs(denominator) <= kEpsilon) {
+        return false;
+    }
+
+    double t = cross(qp, s) / denominator;
+    double u = cross(qp, r) / denominator;
+
+    if (t < -1e-9 || t > 1.0 + 1e-9 || u < -1e-9 || u > 1.0 + 1e-9) {
+        return false;
+    }
+
+    xIntersection = p.x + t * r.x;
+    return true;
+}
+
+struct SweepSegment {
+    Segment2D segment;
+    double minX;
+    double maxX;
+
+    double yAt(double x) const {
+        return segment.start.y + (x - segment.start.x) * (segment.end.y - segment.start.y) /
+            (segment.end.x - segment.start.x);
+    }
+};
+
+struct SweepState {
+    std::vector<SweepSegment> segments;
+    std::vector<int> activeIndices;
+    std::vector<int> activePositions;
+    std::vector<std::pair<double, int>> startEvents;
+    std::vector<std::pair<double, int>> endEvents;
+    std::size_t nextStart = 0;
+    std::size_t nextEnd = 0;
+};
+
+SweepState buildSweepState(const std::vector<Segment2D>& segments) {
+    SweepState state;
+
+    for (const auto& segment : segments) {
+        double minX = std::min(segment.start.x, segment.end.x);
+        double maxX = std::max(segment.start.x, segment.end.x);
+        if (maxX - minX <= 1e-9) {
+            continue;
+        }
+
+        int index = static_cast<int>(state.segments.size());
+        state.segments.push_back({segment, minX, maxX});
+        state.startEvents.emplace_back(minX, index);
+        state.endEvents.emplace_back(maxX, index);
+    }
+
+    std::sort(state.startEvents.begin(), state.startEvents.end());
+    std::sort(state.endEvents.begin(), state.endEvents.end());
+    state.activePositions.assign(state.segments.size(), -1);
+    return state;
+}
+
+void activateSegment(SweepState& state, int index) {
+    if (state.activePositions[index] >= 0) {
+        return;
+    }
+
+    state.activePositions[index] = static_cast<int>(state.activeIndices.size());
+    state.activeIndices.push_back(index);
+}
+
+void deactivateSegment(SweepState& state, int index) {
+    int position = state.activePositions[index];
+    if (position < 0) {
+        return;
+    }
+
+    int lastIndex = state.activeIndices.back();
+    state.activeIndices[position] = lastIndex;
+    state.activePositions[lastIndex] = position;
+    state.activeIndices.pop_back();
+    state.activePositions[index] = -1;
+}
+
+void advanceSweep(SweepState& state, double xEvent) {
+    while (state.nextEnd < state.endEvents.size() && std::abs(state.endEvents[state.nextEnd].first - xEvent) <= 1e-9) {
+        deactivateSegment(state, state.endEvents[state.nextEnd].second);
+        ++state.nextEnd;
+    }
+
+    while (state.nextStart < state.startEvents.size() && std::abs(state.startEvents[state.nextStart].first - xEvent) <= 1e-9) {
+        activateSegment(state, state.startEvents[state.nextStart].second);
+        ++state.nextStart;
+    }
+}
+
+std::vector<Interval> intervalsAtX(const SweepState& state, double x) {
+    std::vector<double> intersections;
+    intersections.reserve(state.activeIndices.size());
+
+    for (int index : state.activeIndices) {
+        intersections.push_back(state.segments[index].yAt(x));
+    }
+
+    std::sort(intersections.begin(), intersections.end());
+
+    std::vector<Interval> intervals;
+    for (std::size_t i = 0; i + 1 < intersections.size(); i += 2) {
+        if (intersections[i + 1] > intersections[i] + 1e-9) {
+            intervals.emplace_back(intersections[i], intersections[i + 1]);
+        }
+    }
+
+    return intervals;
+}
+
+double intervalLength(const std::vector<Interval>& intervals) {
+    double length = 0.0;
+    for (const auto& interval : intervals) {
+        length += interval.second - interval.first;
+    }
+    return length;
+}
+
+double intersectionLength(const std::vector<Interval>& lhs, const std::vector<Interval>& rhs) {
+    double overlap = 0.0;
+    std::size_t i = 0;
+    std::size_t j = 0;
+
+    while (i < lhs.size() && j < rhs.size()) {
+        double low = std::max(lhs[i].first, rhs[j].first);
+        double high = std::min(lhs[i].second, rhs[j].second);
+        if (high > low) {
+            overlap += high - low;
+        }
+
+        if (lhs[i].second < rhs[j].second) {
+            ++i;
+        } else {
+            ++j;
+        }
+    }
+
+    return overlap;
+}
+
+double xorCrossSectionLength(const SweepState& lhs, const SweepState& rhs, double x) {
+    const std::vector<Interval> lhsIntervals = intervalsAtX(lhs, x);
+    const std::vector<Interval> rhsIntervals = intervalsAtX(rhs, x);
+
+    const double lhsLength = intervalLength(lhsIntervals);
+    const double rhsLength = intervalLength(rhsIntervals);
+    const double overlap = intersectionLength(lhsIntervals, rhsIntervals);
+    return lhsLength + rhsLength - 2.0 * overlap;
 }
 }
 
@@ -206,6 +424,49 @@ double Geometry::calculateDisplacementCost(Vertex* A, Vertex* B, Vertex* C, Vert
     }
 
     return fallbackArea; 
+}
+
+double Geometry::calculateSymmetricDifferenceArea(const Polygon& lhs, const Polygon& rhs) {
+    std::vector<double> xEvents;
+    const std::vector<Segment2D> lhsSegments = collectSegments(lhs, xEvents);
+    const std::vector<Segment2D> rhsSegments = collectSegments(rhs, xEvents);
+    SweepState lhsSweep = buildSweepState(lhsSegments);
+    SweepState rhsSweep = buildSweepState(rhsSegments);
+
+    for (const auto& lhsSegment : lhsSegments) {
+        for (const auto& rhsSegment : rhsSegments) {
+            double xIntersection = 0.0;
+            if (segmentIntersectionX(lhsSegment, rhsSegment, xIntersection)) {
+                xEvents.push_back(xIntersection);
+            }
+        }
+    }
+
+    sortAndUnique(xEvents);
+    if (xEvents.size() < 2) {
+        return 0.0;
+    }
+
+    double totalArea = 0.0;
+    for (std::size_t i = 0; i + 1 < xEvents.size(); ++i) {
+        double x0 = xEvents[i];
+        double x1 = xEvents[i + 1];
+        advanceSweep(lhsSweep, x0);
+        advanceSweep(rhsSweep, x0);
+
+        double width = x1 - x0;
+        if (width <= 1e-9) {
+            continue;
+        }
+
+        double leftSample = x0 + width / 3.0;
+        double rightSample = x0 + 2.0 * width / 3.0;
+        double leftLength = xorCrossSectionLength(lhsSweep, rhsSweep, leftSample);
+        double rightLength = xorCrossSectionLength(lhsSweep, rhsSweep, rightSample);
+        totalArea += width * (leftLength + rightLength) / 2.0;
+    }
+
+    return totalArea;
 }
 
 double Geometry::calculateTotalArea(const Polygon& poly) {
