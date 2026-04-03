@@ -1,8 +1,7 @@
 ring_id,vertex_id,x,y
-0,0,-5,-10
-0,1,15,-10
-0,2,15,10
-0,3,-5,10
+0,0,15,-10
+0,1,15,10
+0,2,-25,0
 1,0,-2,5
 1,1,5,5
 1,2,5,-5
@@ -10,6 +9,9 @@ ring_id,vertex_id,x,y
 2,1,11.25,3
 2,2,14,-2
 2,3,12,-8
+Target vertices: 7
 Total signed area in input: 3.210000e+02
 Total signed area in output: 3.210000e+02
-Total areal displacement: 1.600000e+00
+Total areal displacement: 2.016000e+02
+Running time: 0.46 ms
+Peak memory: 3.56 MB

@@ -98,6 +98,9 @@ ring_id,vertex_id,x,y
 0,96,1451055.793,-1375591.389
 0,97,1449130.633,-1379215.795
 0,98,1450326.658,-1381262.247
+Target vertices: 99
 Total signed area in input: 1.305116e+09
 Total signed area in output: 1.305116e+09
 Total areal displacement: 8.955602e+06
+Running time: 15.88 ms
+Peak memory: 6.74 MB

@@ -42,11 +42,16 @@ run: $(EXECUTABLE) $(OUT_DIR)
 		out="$(OUT_DIR)/my_output_$$name.txt"; \
 		target=$(TARGET_VERTICES_DEFAULT); \
 		case "$$name" in \
-			rectangle_with_two_holes) target=11 ;; \
+			rectangle_with_two_holes) target=7 ;; \
 			cushion_with_hexagonal_hole) target=13 ;; \
 			blob_with_two_holes) target=17 ;; \
 			wavy_with_three_holes) target=21 ;; \
 			lake_with_two_islands) target=17 ;; \
+			custom_dense_hole_grid) target=20 ;; \
+			custom_narrow_gaps_with_three_holes) target=15 ;; \
+			custom_near_collinear_wavy_shell) target=10 ;; \
+			custom_pinch_corridor_with_two_holes) target=12 ;; \
+			custom_comb_bays_with_inner_hole) target=18 ;; \
 		esac; \
 		./$(EXECUTABLE) "$$input" "$$target" > "$$out"; \
 		echo "Generated $$out (target_vertices=$$target)"; \
