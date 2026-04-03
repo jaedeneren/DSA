@@ -8,7 +8,11 @@ OUT_DIR = generated_outputs
 SOURCES = $(wildcard $(SRC_DIR)/*.cpp)
 OBJECTS = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SOURCES))
 
+ifeq ($(OS),Windows_NT)
+EXECUTABLE = simplify.exe
+else
 EXECUTABLE = simplify
+endif
 
 # Default target vertices for inputs without a custom override.
 TARGET_VERTICES_DEFAULT = 99
