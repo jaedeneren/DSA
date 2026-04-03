@@ -193,19 +193,33 @@ def svg(rings, min_x, max_x, min_y, max_y, fill, stroke):
     xo, yo = (w - span_x * scale) / 2, (h - span_y * scale) / 2
     tx = lambda x: xo + (x - min_x) * scale
     ty = lambda y: h - (yo + (y - min_y) * scale)
-    path_d, circles = "", ""
-    for verts in rings.values():
+    fill_path_d, stroke_paths, circles = "", [], []
+    for ring_id, verts in sorted(rings.items()):
         if not verts:
             continue
         sx, sy = tx(verts[0][0]), ty(verts[0][1])
-        path_d += f"M {sx},{sy} "
-        circles += f"<circle cx='{sx}' cy='{sy}' r='2.5' fill='#e74c3c' />"
+        ring_path = f"M {sx},{sy} "
+        vertex_color = "#e74c3c" if ring_id == 0 else "#ff7f11"
+        ring_stroke = stroke if ring_id == 0 else "#1d4e89"
+        ring_dash = "" if ring_id == 0 else " stroke-dasharray='6 4'"
+        circles.append(f"<circle cx='{sx}' cy='{sy}' r='3' fill='{vertex_color}' stroke='#ffffff' stroke-width='1' />")
         for x, y in verts[1:]:
             cx, cy = tx(x), ty(y)
-            path_d += f"L {cx},{cy} "
-            circles += f"<circle cx='{cx}' cy='{cy}' r='2.5' fill='#e74c3c' />"
-        path_d += "Z "
-    return f"<svg viewBox='0 0 {w} {h}' style='width:100%;height:auto;border-radius:4px;background:#fafafa;border:1px dashed #bdc3c7;'><path d=\"{path_d}\" fill='{fill}' stroke='{stroke}' stroke-width='2' fill-rule='evenodd' />{circles}</svg>"
+            ring_path += f"L {cx},{cy} "
+            circles.append(f"<circle cx='{cx}' cy='{cy}' r='3' fill='{vertex_color}' stroke='#ffffff' stroke-width='1' />")
+        fill_path_d += ring_path + "Z "
+        stroke_paths.append(f"<path d=\"{ring_path}Z\" fill='none' stroke='{ring_stroke}' stroke-width='2' fill-rule='evenodd'{ring_dash} />")
+    return f"<svg viewBox='0 0 {w} {h}' style='width:100%;height:auto;border-radius:4px;background:#fafafa;border:1px dashed #bdc3c7;'><path d=\"{fill_path_d}\" fill='{fill}' stroke='none' fill-rule='evenodd' />{''.join(stroke_paths)}{''.join(circles)}</svg>"
+
+
+def ring_summary(rings):
+    if not rings:
+        return "N/A"
+    parts = []
+    for ring_id, verts in sorted(rings.items()):
+        label = "outer" if ring_id == 0 else f"hole {ring_id}"
+        parts.append(f"{label}: {len(verts)}")
+    return ", ".join(parts)
 
 
 def fit(points, basis):
@@ -396,18 +410,20 @@ def main():
         mem_val = f"{r['my']['memory_mb']:.2f}" if r["my"]["memory_mb"] is not None else "N/A"
         html += f"<div id='{r['name']}' style='margin-top:42px;border-top:2px dashed #e1e8f0;padding-top:26px;'><h3>{r['name']} (Input vertices: {r['input_size']}, holes: {r['holes']})</h3><p class='placeholder-text'><strong>Targets:</strong> {r['property']}. <strong>Why difficult:</strong> {r['challenge']}</p><div class='viz-grid' style='{grid_style}'>"
         if r["has_given"]:
-            html += f"<div class='viz-card'><h4>Given Output ({r['given']['vertex_count']} vertices)</h4>{svg(r['given']['rings'], min_x, max_x, min_y, max_y, 'rgba(52,152,219,0.35)', 'rgba(41,128,185,1.0)')}<div class='metrics-box'><strong>Output Area:</strong> {r['given']['output_area_raw']}<br><strong>Displacement:</strong> {r['given']['displacement_raw']}</div></div>"
-        html += f"<div class='viz-card'><h4>My Output ({r['my']['vertex_count']} vertices)</h4>{svg(r['my']['rings'], min_x, max_x, min_y, max_y, 'rgba(46,204,113,0.35)', 'rgba(39,174,96,1.0)')}<div class='metrics-box'><strong>Output Area:</strong> {r['my']['output_area_raw']}<br><strong>Displacement:</strong> {r['my']['displacement_raw']}<br><strong>Time:</strong> {time_val} ms<br><strong>Peak Memory:</strong> {mem_val} MB</div></div></div></div>"
+            html += f"<div class='viz-card'><h4>Given Output ({r['given']['vertex_count']} vertices)</h4>{svg(r['given']['rings'], min_x, max_x, min_y, max_y, 'rgba(52,152,219,0.35)', 'rgba(41,128,185,1.0)')}<div class='metrics-box'><strong>Output Area:</strong> {r['given']['output_area_raw']}<br><strong>Displacement:</strong> {r['given']['displacement_raw']}<br><strong>Ring vertices:</strong> {ring_summary(r['given']['rings'])}</div></div>"
+        html += f"<div class='viz-card'><h4>My Output ({r['my']['vertex_count']} vertices)</h4>{svg(r['my']['rings'], min_x, max_x, min_y, max_y, 'rgba(46,204,113,0.35)', 'rgba(39,174,96,1.0)')}<div class='metrics-box'><strong>Output Area:</strong> {r['my']['output_area_raw']}<br><strong>Displacement:</strong> {r['my']['displacement_raw']}<br><strong>Ring vertices:</strong> {ring_summary(r['my']['rings'])}<br><strong>Time:</strong> {time_val} ms<br><strong>Peak Memory:</strong> {mem_val} MB</div></div></div></div>"
 
     html += "</section></div>"
     html += "<script>"
     html += f"const timeData={json.dumps(time_points)},timeTrend={json.dumps(time_fit['predicted'])},memData={json.dumps(mem_points)},memTrend={json.dumps(mem_fit['predicted'])},dispLabels={json.dumps(disp_labels)},myDisp={json.dumps(my_disp)},givenDisp={json.dumps(given_disp)},vertLabels={json.dumps(vert_labels)},myVerts={json.dumps(my_verts)},givenVerts={json.dumps(given_verts)},dispSizePoints={json.dumps(disp_size_points)},sweepDatasets={json.dumps(sweep_datasets)},collapseLabels={json.dumps(collapse_labels)},collapseProvided={json.dumps(collapse_provided)},collapseCustom={json.dumps(collapse_custom)};"
+    html += "const sciTick=(value)=>{const n=Number(value);return Number.isFinite(n)?n.toExponential(2):value;};"
+    html += "const plainTick=(value)=>{const n=Number(value);return Number.isFinite(n)?n.toLocaleString():value;};"
     html += "new Chart(document.getElementById('timeChart'),{type:'scatter',data:{datasets:[{label:'Measured Runtime (ms)',data:timeData,backgroundColor:'#e76f51',borderColor:'#e76f51'},{label:'Fit: c · n log₂ n',data:timeTrend,type:'line',borderColor:'#b6462a',fill:false,pointRadius:0,borderDash:[6,6]}]},options:{maintainAspectRatio:false,plugins:{title:{display:true,text:'Running Time vs Input Size'}},scales:{x:{type:'linear',title:{display:true,text:'Input size (vertices)'}},y:{title:{display:true,text:'Running time (ms)'}}}}});"
     html += "new Chart(document.getElementById('memChart'),{type:'scatter',data:{datasets:[{label:'Measured Peak Memory (MB)',data:memData,backgroundColor:'#8e5ea2',borderColor:'#8e5ea2'},{label:'Fit: c · n',data:memTrend,type:'line',borderColor:'#68407a',fill:false,pointRadius:0,borderDash:[6,6]}]},options:{maintainAspectRatio:false,plugins:{title:{display:true,text:'Peak Memory vs Input Size'}},scales:{x:{type:'linear',title:{display:true,text:'Input size (vertices)'}},y:{title:{display:true,text:'Peak memory (MB)'}}}}});"
     html += "new Chart(document.getElementById('dispChart'),{type:'bar',data:{labels:dispLabels,datasets:[{label:'My displacement',data:myDisp,backgroundColor:'rgba(43,147,72,0.85)'},{label:'Given displacement',data:givenDisp,backgroundColor:'rgba(22,138,173,0.85)'}]},options:{maintainAspectRatio:false,plugins:{title:{display:true,text:'Direct Displacement Comparison'}},scales:{y:{type:'logarithmic',title:{display:true,text:'Areal displacement'}}}}});"
     html += "new Chart(document.getElementById('verticesChart'),{type:'bar',data:{labels:vertLabels,datasets:[{label:'My final vertices',data:myVerts,backgroundColor:'rgba(87,117,144,0.85)'},{label:'Given final vertices',data:givenVerts,backgroundColor:'rgba(173,181,189,0.85)'}]},options:{maintainAspectRatio:false,plugins:{title:{display:true,text:'Final Vertex Count Comparison'}},scales:{y:{title:{display:true,text:'Vertices remaining'}}}}});"
-    html += "new Chart(document.getElementById('dispSizeChart'),{type:'scatter',data:{datasets:[{label:'Displacement vs input size',data:dispSizePoints,backgroundColor:'rgba(244,162,97,0.9)',borderColor:'rgba(244,162,97,0.9)'}]},options:{maintainAspectRatio:false,parsing:false,plugins:{title:{display:true,text:'Areal Displacement vs Input Size'},tooltip:{callbacks:{label:(c)=>`${c.raw.label}: n=${c.raw.x}, displacement=${c.raw.y.toExponential(6)}`}}},scales:{x:{type:'linear',title:{display:true,text:'Input size (vertices)'}},y:{type:'logarithmic',title:{display:true,text:'Areal displacement'}}}}});"
-    html += "new Chart(document.getElementById('targetSweepChart'),{type:'scatter',data:{datasets:sweepDatasets},options:{maintainAspectRatio:false,parsing:false,plugins:{title:{display:true,text:'Areal Displacement vs Target Vertex Count'},tooltip:{callbacks:{label:(c)=>`${c.dataset.label}: target=${c.raw.x}, displacement=${c.raw.y.toExponential(6)}, actual vertices=${c.raw.actual_vertices}`}}},scales:{x:{type:'linear',title:{display:true,text:'Requested target vertex count'}},y:{type:'logarithmic',title:{display:true,text:'Areal displacement'}}}}});"
+    html += "new Chart(document.getElementById('dispSizeChart'),{type:'scatter',data:{datasets:[{label:'Displacement vs input size',data:dispSizePoints,backgroundColor:'rgba(244,162,97,0.9)',borderColor:'rgba(244,162,97,0.9)',pointRadius:4,pointHoverRadius:6}]},options:{maintainAspectRatio:false,parsing:false,layout:{padding:{top:8,right:12,bottom:8,left:8}},plugins:{title:{display:true,text:'Areal Displacement vs Input Size'},legend:{position:'bottom'},tooltip:{callbacks:{label:(c)=>`${c.raw.label}: n=${Number(c.raw.x).toLocaleString()}, displacement=${c.raw.y.toExponential(6)}`}}},scales:{x:{type:'logarithmic',title:{display:true,text:'Input size (vertices, log scale)'},ticks:{callback:plainTick}},y:{type:'logarithmic',title:{display:true,text:'Areal displacement (log scale)'},ticks:{callback:sciTick}}}}});"
+    html += "new Chart(document.getElementById('targetSweepChart'),{type:'scatter',data:{datasets:sweepDatasets},options:{maintainAspectRatio:false,parsing:false,layout:{padding:{top:8,right:12,bottom:8,left:8}},plugins:{title:{display:true,text:'Areal Displacement vs Target Vertex Count'},legend:{position:'bottom'},tooltip:{callbacks:{label:(c)=>`${c.dataset.label}: target=${Number(c.raw.x).toLocaleString()}, displacement=${c.raw.y.toExponential(6)}, actual vertices=${c.raw.actual_vertices}`}}},scales:{x:{type:'logarithmic',title:{display:true,text:'Requested target vertex count (log scale)'},ticks:{callback:plainTick}},y:{type:'logarithmic',title:{display:true,text:'Areal displacement (log scale)'},ticks:{callback:sciTick}}}}});"
     html += "new Chart(document.getElementById('collapseChart'),{type:'bar',data:{labels:collapseLabels,datasets:[{label:'Provided datasets',data:collapseProvided,backgroundColor:'rgba(22,138,173,0.85)'},{label:'Custom datasets',data:collapseCustom,backgroundColor:'rgba(233,196,106,0.85)'}]},options:{maintainAspectRatio:false,plugins:{title:{display:true,text:'Average Time per Accepted Collapse'}},scales:{y:{title:{display:true,text:'Milliseconds per collapse'}}}}});"
     html += "</script></body></html>"
 
