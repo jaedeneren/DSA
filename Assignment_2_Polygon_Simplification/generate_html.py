@@ -9,7 +9,7 @@ from decimal import Decimal, InvalidOperation
 GIVEN_DIR = "output_test_cases"
 MY_DIR = "generated_outputs"
 INPUT_DIR = "input_test_cases"
-HTML_FILE = "Assignment2_Results_Report.html"
+HTML_FILE = "Assignment_2_Results_Report.html"
 
 NOTES = {
     "output_rectangle_with_two_holes.txt": ("Minimal shell with multiple holes", "Very little slack: one bad collapse can turn the outer shell into a triangle and spike displacement."),

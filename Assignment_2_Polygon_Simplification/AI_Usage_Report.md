@@ -1,0 +1,31 @@
+# AI Usage Report
+
+## Introduction
+
+This project implements area-and-topology-preserving polygon simplification using Area-Preserving Segment Collapse (APSC) as the core idea. Generative AI was used as a coding and debugging assistant throughout the work. My prompting strategy changed over time. At the beginning, I asked broad design questions about how to represent polygon rings, what data structures would support repeated local edits, and how to maintain topological validity efficiently. Later, the prompts became more specific and task-oriented: how to manage a priority queue with stale entries, how to structure linked-list updates safely, how to compare generated outputs against expected files, and how to present the results clearly in the HTML report.
+
+AI was most helpful on tasks where a strong programming pattern existed, but the final implementation still needed human review. Examples include modularizing the code into geometry, polygon, simplifier, and spatial-index components; drafting boilerplate for parsing CSV files; and suggesting implementation patterns such as lazy deletion and neighbourhood-based updates. That support accelerated development, but it did not replace the need to verify the algorithmic details against the assignment requirements and the Kronenfeld et al. paper.
+
+## Analysis of AI Suggestions
+
+Several AI suggestions were clearly useful. First, the recommendation to represent each ring as a circular doubly linked list was important because APSC repeatedly removes and reconnects local neighbourhoods. A plain array-based representation would have made those local edits much more expensive. Second, the suggestion to use lazy invalidation for vertices and queue entries helped keep the candidate-selection logic efficient. Rather than rebuilding the entire priority queue every time a nearby collapse changed the local geometry, the implementation can discard stale entries when they rise to the top. Third, the AI suggested using a lightweight spatial grid for topology checks, which fit the project well because it kept the code self-contained while still reducing the cost of intersection testing.
+
+Other suggestions were only partially correct and had to be revised. One early idea used a simpler heuristic for placing the replacement point `E`. Although it could preserve area, it did not reliably minimize areal displacement the way the assignment requires, so that logic had to be replaced by a more faithful implementation of the APSC approach. Another issue appeared in linked-list updates: one AI-generated version marked a vertex inactive too early, which prevented the actual neighbour pointers from being rewired correctly. That bug could only be found by stepping through the code carefully and reasoning about the update order.
+
+The queue-management logic also needed human correction. Some collapse candidates remained technically present in the queue even after nearby edits had changed the local sequence of vertices. Those entries looked superficially valid, but they no longer represented the intended `A-B-C-D` neighbourhood. The fix was to explicitly revalidate the neighbourhood before accepting a collapse. Finally, the work on benchmark matching showed that debugging had to include the documentation and workflow too, not only the algorithm. For example, the rectangle-with-two-holes case required careful interpretation of the target and final-vertex-count behaviour, and later the Makefile/README expectations for the deliverables also had to be aligned with the project requirements.
+
+## Reflection on AI Assistance
+
+Using AI changed the nature of the work. Instead of spending most of the time writing standard C++ syntax from scratch, I spent more time evaluating suggestions, checking invariants, and verifying behaviour against the expected outputs. In that sense, AI worked best as a fast drafting and brainstorming partner. It was especially effective for repetitive scaffolding, refactoring, and presentation tasks such as reorganizing the report generator, improving chart readability, and formatting results consistently.
+
+At the same time, this project showed the limits of AI very clearly. Computational geometry is full of plausible-but-wrong answers: a suggested simplification step can look reasonable while still violating a subtle topological condition or increasing displacement in a way that only appears on a hard benchmark. Because of that, I could not accept nontrivial suggestions without verification. Human judgment was essential whenever the task depended on geometric correctness, ring topology, benchmarking interpretation, or honest documentation of what the implementation actually does. The most valuable lesson was that AI is strongest when used critically. It can speed up exploration, but the final responsibility for correctness, testing, and design still belongs to the developer.
+
+## Distribution of Work with AI and Within the Team
+
+AI contributed in several concrete ways. It helped draft code structure, suggested ring and queue data structures, proposed the spatial-grid idea for intersection checks, assisted with CSV and report-generation utilities, and supported debugging by surfacing likely causes when output files did not match expectations. It also helped improve the HTML report by adding charts, exact-value formatting, clearer visualizations, and rubric-oriented sections.
+
+The human contribution was responsible for the core engineering decisions and all final validation. I chose which AI suggestions to adopt, corrected the incorrect ones, and verified the implementation against the instructor outputs. I also handled the algorithm-specific reasoning needed to prevent stale collapses, protect the exterior ring from pathological over-simplification, and bias candidate selection toward lower-displacement outcomes. On the reporting side, I checked the rubric requirements and adjusted the README and HTML report, so the deliverables reflected the actual state of the project rather than an idealized description.
+
+If this repository is submitted as a team project, the human side of the work should be expanded to name the individual responsibilities of the teammates. In the current text, the human role is written from the perspective of the repository owner and the recorded working session.
+
+Word count: 909

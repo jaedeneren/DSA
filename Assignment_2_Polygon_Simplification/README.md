@@ -74,7 +74,7 @@ This is only needed if you want to regenerate the C++ program outputs yourself. 
 python3 generate_html.py
 ```
 
-This regenerates [Assignment2_Results_Report.html](Assignment2_Results_Report.html) from the current generated outputs.
+This regenerates [Assignment_2_Results_Report.html](Assignment_2_Results_Report.html) from the current generated outputs.
 
 ## Test Results
 
