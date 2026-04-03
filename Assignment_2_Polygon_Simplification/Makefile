@@ -47,11 +47,11 @@ run: $(EXECUTABLE) $(OUT_DIR)
 			blob_with_two_holes) target=17 ;; \
 			wavy_with_three_holes) target=21 ;; \
 			lake_with_two_islands) target=17 ;; \
-			custom_dense_hole_grid) target=20 ;; \
-			custom_narrow_gaps_with_three_holes) target=15 ;; \
-			custom_near_collinear_wavy_shell) target=10 ;; \
-			custom_pinch_corridor_with_two_holes) target=12 ;; \
-			custom_comb_bays_with_inner_hole) target=18 ;; \
+			custom_high_hole) target=350 ;; \
+			custom_high_vertex) target=500 ;; \
+			custom_narrow_gaps) target=50 ;; \
+			custom_near_degeneracies) target=100 ;; \
+			custom_combined) target=1500 ;; \
 		esac; \
 		./$(EXECUTABLE) "$$input" "$$target" > "$$out"; \
 		echo "Generated $$out (target_vertices=$$target)"; \
