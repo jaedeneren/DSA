@@ -20,5 +20,5 @@ Target vertices: 17
 Total signed area in input: 9.210000e+05
 Total signed area in output: 9.210000e+05
 Total areal displacement: 6.106276e+04
-Running time: 0.11 ms
+Running time: 0.16 ms
 Peak memory: 3.88 MB

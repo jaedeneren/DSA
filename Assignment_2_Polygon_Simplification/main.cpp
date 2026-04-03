@@ -2,7 +2,9 @@
 #include <string>
 #include <iomanip>
 #include <chrono>           // Added for timing
+#ifndef _WIN32
 #include <sys/resource.h>   // Added for peak memory (Linux/macOS)
+#endif
 #include "polygon.h"
 #include "simplifier.h"
 #include "geometry.h"
@@ -60,13 +62,15 @@ int main(int argc, char* argv[]) {
     // ==========================================
     // CALCULATE & PRINT PERFORMANCE METRICS
     // ==========================================
+    double peakMemoryMB = 0.0;
+#ifndef _WIN32
     struct rusage usage;
     getrusage(RUSAGE_SELF, &usage);
     
-    // Note: ru_maxrss is in Kilobytes on Linux, but Bytes on macOS. 
-    // Assuming you are running this on a standard Linux environment (like WSL or a school server),
-    // divide by 1024.0 to get Megabytes.
-    double peakMemoryMB = usage.ru_maxrss / 1024.0;
+    // Note: ru_maxrss is in Kilobytes on Linux, but Bytes on macOS.
+    // Assuming a standard Linux environment, divide by 1024.0 to get Megabytes.
+    peakMemoryMB = usage.ru_maxrss / 1024.0;
+#endif
 
     // Switch back to fixed notation for cleaner ms/MB formatting
     std::cout << std::fixed << std::setprecision(2);

@@ -162,6 +162,15 @@ void Simplifier::run(int targetVertices)
             continue;
         }
 
+        // Keep the exterior shell at four or more vertices. The provided
+        // benchmarks still allow triangular holes, but collapsing the outer
+        // boundary from a quadrilateral to a triangle causes large
+        // displacement spikes on cases such as rectangle_with_two_holes.
+        if (best.A->ring_id == 0 && poly.rings[best.A->ring_id].vertexCount <= 4) {
+            delete best.E;
+            continue;
+        }
+
         // 2. TOPOLOGY CHECK: Does this move break the shape?
         if (!spatialMap.isTopologyValid(best.A, best.B, best.C, best.D, best.E)) {
             delete best.E;

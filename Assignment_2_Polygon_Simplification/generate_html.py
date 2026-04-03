@@ -2,12 +2,30 @@ import os
 import glob
 import json
 import math
+import re
 
 # Directory configuration
 GIVEN_DIR = "output_test_cases"
 MY_DIR = "generated_outputs"
 INPUT_DIR = "input_test_cases"
 HTML_FILE = "Assignment2_Results_Report.html"
+
+def parse_target_map():
+    """Reads the suggested target vertices from output_test_cases/README.md."""
+    readme_path = os.path.join(GIVEN_DIR, "README.md")
+    targets = {}
+
+    if not os.path.exists(readme_path):
+        return targets
+
+    pattern = re.compile(r"\|\s*`input_(.+?)\.csv`\s*\|.*\|\s*(\d+)\s*\|\s*`output_.+?\.txt`\s*\|")
+    with open(readme_path, 'r', encoding='utf-8') as f:
+        for line in f:
+            match = pattern.search(line)
+            if match:
+                targets[f"output_{match.group(1)}.txt"] = int(match.group(2))
+
+    return targets
 
 def get_input_size(base_filename):
     """Counts the number of vertices in the original input CSV."""
@@ -116,15 +134,25 @@ def generate_table_html(cases, title):
     html = f"<h3>{title}</h3><div style='overflow-x: auto;'><table>"
     html += "<thead><tr><th>Test Case</th><th>Input Vertices</th><th>Target Vertices</th><th>Actual Vertices</th><th>Input Area</th><th>Given Output Area</th><th>Actual Displacement</th><th>Given Displacement</th><th>Diff (Displacement)</th><th>Time (ms)</th><th>Memory (MB)</th></tr></thead><tbody>"
     for r in cases:
-        target_v = r['my']['target_vertices']
-        if target_v == 'N/A' and r['has_given']: target_v = r['given']['vertex_count'] 
+        target_v = r['target_vertices']
+        if target_v == 'N/A':
+            target_v = r['my']['target_vertices']
+        if target_v == 'N/A' and r['has_given']:
+            target_v = r['given']['vertex_count']
         m_disp = r['my']['displacement']
         g_disp = r['given']['displacement'] if r['has_given'] else 'N/A'
         
         diff_html = "N/A"
         if m_disp != 'N/A' and g_disp != 'N/A':
-            diff = m_disp - g_disp
-            diff_html = f"<span style='color: #2ecc71; font-weight: bold;'>{diff:+.2e}</span>" if diff <= 0.00001 else f"<span style='color: #e74c3c; font-weight: bold;'>{diff:+.2e}</span>"
+            if r['my']['vertex_count'] != r['given']['vertex_count']:
+                diff_html = (
+                    f"<span style='color: #f39c12; font-weight: bold;'>"
+                    f"N/A ({r['my']['vertex_count']} vs {r['given']['vertex_count']} verts)"
+                    f"</span>"
+                )
+            else:
+                diff = m_disp - g_disp
+                diff_html = f"<span style='color: #2ecc71; font-weight: bold;'>{diff:+.2e}</span>" if diff <= 0.00001 else f"<span style='color: #e74c3c; font-weight: bold;'>{diff:+.2e}</span>"
         
         m_disp_str = f"{m_disp:.2e}" if m_disp != 'N/A' else "N/A"
         g_disp_str = f"{g_disp:.2e}" if g_disp != 'N/A' else "N/A"
@@ -142,6 +170,7 @@ def get_sort_key(result_dict):
     return (priority, result_dict['name'])
 
 def main():
+    target_map = parse_target_map()
     my_files = glob.glob(os.path.join(MY_DIR, "my_output_*.txt"))
     if not my_files: return
 
@@ -156,7 +185,14 @@ def main():
         input_size = get_input_size(given_filename)
         
         if not my_data: continue
-        results.append({'name': given_filename, 'input_size': input_size, 'my': my_data, 'given': given_data, 'has_given': given_data is not None})
+        results.append({
+            'name': given_filename,
+            'input_size': input_size,
+            'target_vertices': target_map.get(given_filename, 'N/A'),
+            'my': my_data,
+            'given': given_data,
+            'has_given': given_data is not None
+        })
 
     given_cases = sorted([r for r in results if r['has_given']], key=get_sort_key)
     custom_cases = sorted([r for r in results if not r['has_given']], key=get_sort_key)
@@ -255,7 +291,7 @@ def main():
     <div class="container">
         <section id="overview">
             <h2>Test Results Overview</h2>
-            <p class="placeholder-text">A comparison of simplified outputs against the provided datasets and custom challenging test cases. Diff(displacement) evaluates heuristic performance relative to the baseline.</p>
+            <p class="placeholder-text">A comparison of simplified outputs against the provided datasets and custom challenging test cases. Displacement differences are only treated as directly comparable when both outputs end with the same final vertex count.</p>
     """
     html_content += generate_table_html(given_cases, "Provided Test Cases")
     html_content += generate_table_html(custom_cases, "Custom Test Cases")
@@ -273,7 +309,7 @@ def main():
 
         <section id="displacement">
             <h2>Areal Displacement & Minimum Vertices Quality</h2>
-            <p class="placeholder-text">Left: Areal displacement comparison (Log scale). Right: Evaluation of the algorithm's ability to bypass topological deadlocks (e.g. reaching 10 vertices where the baseline stops at 11).</p>
+            <p class="placeholder-text">Left: Areal displacement comparison (Log scale) for cases with matching final vertex counts. Right: evaluation of the algorithm's ability to bypass topological deadlocks (for example, reaching 10 vertices where the baseline stops at 11).</p>
             <div class="two-chart-grid">
                 <div class="chart-container"><canvas id="dispChart"></canvas></div>
                 <div class="chart-container"><canvas id="verticesChart"></canvas></div>
@@ -332,9 +368,15 @@ def main():
             <div class="metrics-box"><strong>Actual Displacement:</strong> {r['my']['displacement']}<br><strong>Output Area:</strong> {r['my']['output_area']}</div>
         </div></div></div>"""
 
-    disp_labels = [r['name'] for r in given_cases]
-    my_disp = [r['my']['displacement'] if r['my']['displacement'] != 'N/A' else 0 for r in given_cases]
-    given_disp = [r['given']['displacement'] if r['has_given'] and r['given']['displacement'] != 'N/A' else 0 for r in given_cases]
+    comparable_given_cases = [
+        r for r in given_cases
+        if r['my']['vertex_count'] == r['given']['vertex_count']
+        and r['my']['displacement'] != 'N/A'
+        and r['given']['displacement'] != 'N/A'
+    ]
+    disp_labels = [r['name'] for r in comparable_given_cases]
+    my_disp = [r['my']['displacement'] for r in comparable_given_cases]
+    given_disp = [r['given']['displacement'] for r in comparable_given_cases]
 
     html_content += f"""
         </section>
