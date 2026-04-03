@@ -3,12 +3,24 @@ import glob
 import json
 import math
 import re
+from decimal import Decimal, InvalidOperation
 
 # Directory configuration
 GIVEN_DIR = "output_test_cases"
 MY_DIR = "generated_outputs"
 INPUT_DIR = "input_test_cases"
 HTML_FILE = "Assignment2_Results_Report.html"
+
+def parse_decimal(value):
+    try:
+        return Decimal(value)
+    except (InvalidOperation, TypeError):
+        return None
+
+def format_decimal_scientific(value):
+    if value is None:
+        return "N/A"
+    return f"{float(value):.6e}"
 
 def parse_target_map():
     """Reads the suggested target vertices from output_test_cases/README.md."""
@@ -53,8 +65,11 @@ def parse_file(filepath):
         'rings': {},
         'vertex_count': 0,
         'input_area': 'N/A',
+        'input_area_raw': 'N/A',
         'output_area': 'N/A',
+        'output_area_raw': 'N/A',
         'displacement': 'N/A',
+        'displacement_raw': 'N/A',
         'target_vertices': 'N/A',
         'time_ms': None,
         'memory_mb': None
@@ -66,11 +81,17 @@ def parse_file(filepath):
             if not line: continue
             
             if line.startswith('Total signed area in input:'):
-                data['input_area'] = float(line.split(':')[1].strip())
+                raw_value = line.split(':', 1)[1].strip()
+                data['input_area'] = float(raw_value)
+                data['input_area_raw'] = raw_value
             elif line.startswith('Total signed area in output:'):
-                data['output_area'] = float(line.split(':')[1].strip())
+                raw_value = line.split(':', 1)[1].strip()
+                data['output_area'] = float(raw_value)
+                data['output_area_raw'] = raw_value
             elif line.startswith('Total areal displacement:'):
-                data['displacement'] = float(line.split(':')[1].strip())
+                raw_value = line.split(':', 1)[1].strip()
+                data['displacement'] = float(raw_value)
+                data['displacement_raw'] = raw_value
             elif line.startswith('Running time:'):
                 data['time_ms'] = float(line.split(':')[1].replace('ms', '').strip())
             elif line.startswith('Peak memory:'):
@@ -151,13 +172,20 @@ def generate_table_html(cases, title):
                     f"</span>"
                 )
             else:
-                diff = m_disp - g_disp
-                diff_html = f"<span style='color: #2ecc71; font-weight: bold;'>{diff:+.2e}</span>" if diff <= 0.00001 else f"<span style='color: #e74c3c; font-weight: bold;'>{diff:+.2e}</span>"
+                my_disp_decimal = parse_decimal(r['my']['displacement_raw'])
+                given_disp_decimal = parse_decimal(r['given']['displacement_raw'])
+                diff = None if my_disp_decimal is None or given_disp_decimal is None else (my_disp_decimal - given_disp_decimal)
+                diff_str = format_decimal_scientific(diff)
+                diff_html = (
+                    f"<span style='color: #2ecc71; font-weight: bold;'>{diff_str}</span>"
+                    if diff is not None and diff <= Decimal("0.00001")
+                    else f"<span style='color: #e74c3c; font-weight: bold;'>{diff_str}</span>"
+                )
         
-        m_disp_str = f"{m_disp:.2e}" if m_disp != 'N/A' else "N/A"
-        g_disp_str = f"{g_disp:.2e}" if g_disp != 'N/A' else "N/A"
-        in_area = f"{r['my']['input_area']:.2e}" if isinstance(r['my']['input_area'], float) else "N/A"
-        out_area = f"{r['given']['output_area']:.2e}" if (r['has_given'] and isinstance(r['given']['output_area'], float)) else "N/A"
+        m_disp_str = r['my']['displacement_raw'] if m_disp != 'N/A' else "N/A"
+        g_disp_str = r['given']['displacement_raw'] if g_disp != 'N/A' else "N/A"
+        in_area = r['my']['input_area_raw'] if isinstance(r['my']['input_area'], float) else "N/A"
+        out_area = r['given']['output_area_raw'] if (r['has_given'] and isinstance(r['given']['output_area'], float)) else "N/A"
         time_val = f"{r['my']['time_ms']:.2f}" if r['my']['time_ms'] is not None else "N/A"
         mem_val = f"{r['my']['memory_mb']:.2f}" if r['my']['memory_mb'] is not None else "N/A"
         
