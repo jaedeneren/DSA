@@ -71,7 +71,7 @@ This is only needed if you want to regenerate the C++ program outputs yourself. 
 ## HTML Report
 
 ```sh
-python generate_html.py
+python3 generate_html.py
 ```
 
 This regenerates [Assignment2_Results_Report.html](Assignment2_Results_Report.html) from the current generated outputs.
@@ -89,3 +89,17 @@ The current implementation has been checked against all 15 instructor-provided r
 
 - Python 3 for `generate_html.py`
 - A C++17-compatible compiler and `make` only if you want to rebuild and rerun the simplifier locally
+
+## Implementation Summary
+
+- The polygon is represented as a set of circular doubly linked rings so local collapses can update neighbors in constant time.
+- Candidate collapses are stored in a priority queue ordered by estimated areal displacement, which avoids rescanning all vertices after every accepted move.
+- A lightweight spatial grid is used for intersection checks so topology validation does not require comparing against every edge globally.
+- Only the local neighborhood around an accepted collapse is recomputed, rather than rebuilding the full candidate set after each step.
+
+## Enhancements Beyond Basic APSC
+
+- The implementation keeps the paper-style area-preserving segment collapse as the core operation, but adds a stronger bias toward boundary-intersection candidates instead of overusing interpolated fallback placements.
+- Stale queue entries are filtered out by checking that the affected `A-B-C-D` sequence is still consecutive before a collapse is applied.
+- The simplifier prevents the exterior ring from collapsing below four vertices, which avoids pathological outer-shell triangles on multi-hole benchmarks such as `rectangle_with_two_holes`.
+- On the current instructor suite, these choices keep the generated displacement equal to or lower than the provided outputs across all 15 reference cases.
