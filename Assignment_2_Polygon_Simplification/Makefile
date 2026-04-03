@@ -2,17 +2,24 @@ CXX = g++
 CXXFLAGS = -std=c++17 -Wall -Wextra -O3
 SRC_DIR = .
 OBJ_DIR = obj
-TEST_DIR = test_cases
+INPUT_DIR = input_test_cases
 OUT_DIR = generated_outputs
 
-# The list of objects now explicitly includes the new visualization component
 SOURCES = $(wildcard $(SRC_DIR)/*.cpp)
-OBJECTS = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SOURCES))
+OBJECTS = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SOURCES))
+
+ifeq ($(OS),Windows_NT)
+EXECUTABLE = simplify.exe
+else
 EXECUTABLE = simplify
+endif
+
+# Default target vertices for inputs without a custom override.
+TARGET_VERTICES_DEFAULT = 99
 
 all: $(EXECUTABLE)
 
-.PHONY: all clean generate_outputs
+.PHONY: all run generate_outputs clean
 
 $(EXECUTABLE): $(OBJECTS)
 	$(CXX) $(CXXFLAGS) $^ -o $@
@@ -24,22 +31,28 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 $(OUT_DIR):
 	@mkdir -p $(OUT_DIR)
 
-generate_outputs: $(EXECUTABLE) $(OUT_DIR)
-	./$(EXECUTABLE) $(TEST_DIR)/input_rectangle_with_two_holes.csv 11 > $(OUT_DIR)/my_output_rectangle_with_two_holes.txt
-	./$(EXECUTABLE) $(TEST_DIR)/input_cushion_with_hexagonal_hole.csv 13 > $(OUT_DIR)/my_output_cushion_with_hexagonal_hole.txt
-	./$(EXECUTABLE) $(TEST_DIR)/input_blob_with_two_holes.csv 17 > $(OUT_DIR)/my_output_blob_with_two_holes.txt
-	./$(EXECUTABLE) $(TEST_DIR)/input_wavy_with_three_holes.csv 21 > $(OUT_DIR)/my_output_wavy_with_three_holes.txt
-	./$(EXECUTABLE) $(TEST_DIR)/input_lake_with_two_islands.csv 17 > $(OUT_DIR)/my_output_lake_with_two_islands.txt
-	./$(EXECUTABLE) $(TEST_DIR)/input_original_01.csv 99 > $(OUT_DIR)/my_output_01.txt
-	./$(EXECUTABLE) $(TEST_DIR)/input_original_02.csv 99 > $(OUT_DIR)/my_output_02.txt
-	./$(EXECUTABLE) $(TEST_DIR)/input_original_03.csv 99 > $(OUT_DIR)/my_output_03.txt
-	./$(EXECUTABLE) $(TEST_DIR)/input_original_04.csv 99 > $(OUT_DIR)/my_output_04.txt
-	./$(EXECUTABLE) $(TEST_DIR)/input_original_05.csv 99 > $(OUT_DIR)/my_output_05.txt
-	./$(EXECUTABLE) $(TEST_DIR)/input_original_06.csv 99 > $(OUT_DIR)/my_output_06.txt
-	./$(EXECUTABLE) $(TEST_DIR)/input_original_07.csv 99 > $(OUT_DIR)/my_output_07.txt
-	./$(EXECUTABLE) $(TEST_DIR)/input_original_08.csv 99 > $(OUT_DIR)/my_output_08.txt
-	./$(EXECUTABLE) $(TEST_DIR)/input_original_09.csv 99 > $(OUT_DIR)/my_output_09.txt
-	./$(EXECUTABLE) $(TEST_DIR)/input_original_10.csv 99 > $(OUT_DIR)/my_output_10.txt
+# Build and process every input_*.csv into generated_outputs/my_output_*.txt.
+run: $(EXECUTABLE) $(OUT_DIR)
+	@set -e; \
+	for input in $(INPUT_DIR)/input_*.csv; do \
+		[ -f "$$input" ] || continue; \
+		base=$${input##*/}; \
+		name=$${base#input_}; \
+		name=$${name%.csv}; \
+		out="$(OUT_DIR)/my_output_$$name.txt"; \
+		target=$(TARGET_VERTICES_DEFAULT); \
+		case "$$name" in \
+			rectangle_with_two_holes) target=11 ;; \
+			cushion_with_hexagonal_hole) target=13 ;; \
+			blob_with_two_holes) target=17 ;; \
+			wavy_with_three_holes) target=21 ;; \
+			lake_with_two_islands) target=17 ;; \
+		esac; \
+		./$(EXECUTABLE) "$$input" "$$target" > "$$out"; \
+		echo "Generated $$out (target_vertices=$$target)"; \
+	done
+
+generate_outputs: run
 
 clean:
 	rm -rf $(OBJ_DIR) $(EXECUTABLE) $(OUT_DIR)
