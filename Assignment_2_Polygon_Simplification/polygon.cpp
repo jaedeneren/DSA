@@ -4,6 +4,7 @@ Ring::Ring(int id) : ring_id(id), head(nullptr), vertexCount(0) {}
 
 Ring::~Ring()
 {
+    // Vertices are allocated individually, so each ring frees every vertex it created.
     for (Vertex* v : allVertices) {
         delete v;
     }
@@ -25,6 +26,7 @@ Vertex *Ring::addVertex(int id, double x, double y)
     Vertex* newVertex = new Vertex(id, ring_id, x, y);
     allVertices.push_back(newVertex);
     if (!head) {
+        // A one-vertex ring still behaves like a circular list.
         head = newVertex;
         head->next = head; // Point to itself to form a circular list
         head->prev = head;
@@ -62,6 +64,7 @@ void Ring::removeVertex(Vertex *v)
 void Ring::insertVertexAfter(Vertex *v, Vertex *newV)
 {
     if(!v || !newV) return; // Invalid vertices
+    // This is the local splice used when B and C are replaced by a new point E.
     Vertex* nextV = v->next;
     v->next = newV;
     newV->prev = v;
@@ -131,7 +134,7 @@ void Polygon::loadFromCSV(const char* filename) {
         std::getline(ss, token, ','); x = std::stod(token);
         std::getline(ss, token, ','); y = std::stod(token);
 
-        // If we found a new ring ID, create a new Ring object
+        // Grow the ring array on demand so ring ids can be used directly as indices.
         while (r_id >= (int)rings.size()) {
             rings.emplace_back(rings.size());
         }
@@ -163,6 +166,7 @@ void Polygon::removeVertex(Vertex* v) {
 }
 
 void Polygon::insertVertexAfter(Vertex* target, Vertex* newV) {
+    // New vertices inherit the ring of the edge they split.
     rings[target->ring_id].insertVertexAfter(target, newV);
     totalVertices++;
 }

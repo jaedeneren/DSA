@@ -86,6 +86,7 @@ void appendRingSegments(const Ring& ring, std::vector<Segment2D>& output, std::v
 
 std::vector<Segment2D> collectSegments(const Polygon& poly, std::vector<double>& xEvents) {
     std::vector<Segment2D> segments;
+    // The symmetric-difference sweep works over explicit active segments from both polygons.
     for (const auto& ring : poly.rings) {
         appendRingSegments(ring, segments, xEvents);
     }
@@ -156,6 +157,7 @@ SweepState buildSweepState(const std::vector<Segment2D>& segments) {
 
         int index = static_cast<int>(state.segments.size());
         state.segments.push_back({segment, minX, maxX});
+        // Each segment contributes a start event and an end event to the vertical sweep.
         state.startEvents.emplace_back(minX, index);
         state.endEvents.emplace_back(maxX, index);
     }
@@ -211,6 +213,7 @@ std::vector<Interval> intervalsAtX(const SweepState& state, double x) {
     std::sort(intersections.begin(), intersections.end());
 
     std::vector<Interval> intervals;
+    // Even/odd filling: sorted y-intersections pair up into inside intervals.
     for (std::size_t i = 0; i + 1 < intersections.size(); i += 2) {
         if (intersections[i + 1] > intersections[i] + 1e-9) {
             intervals.emplace_back(intersections[i], intersections[i + 1]);
@@ -269,7 +272,7 @@ double triangleArea(double x1, double y1, double x2, double y2, double x3, doubl
 std::vector<Vertex*> Geometry::calculateE(Vertex* A, Vertex* B, Vertex* C, Vertex* D) {
     std::vector<Vertex*> candidates;
 
-    // 1. Shift to Local Coordinates (A becomes the origin 0,0)
+    // Work in coordinates relative to A to keep the paper's formulas simple.
     double bx = B->x - A->x; double by = B->y - A->y;
     double cx = C->x - A->x; double cy = C->y - A->y;
     double dx = D->x - A->x; double dy = D->y - A->y;
@@ -288,7 +291,7 @@ std::vector<Vertex*> Geometry::calculateE(Vertex* A, Vertex* B, Vertex* C, Verte
     // 2. Line E equation parameters (The Area-Preserving Line)
     double c_E = -(bx * cy - by * cx) - (cx * dy - cy * dx);
 
-    // 3. Compute the two paper-defined intersections with AB and CD.
+    // The paper's main candidates lie where the area-preserving line meets AB and CD.
     double a_AB = by;          
     double b_AB = -bx;         
     double c_AB = 0; 
@@ -302,7 +305,7 @@ std::vector<Vertex*> Geometry::calculateE(Vertex* A, Vertex* B, Vertex* C, Verte
     bool useInteriorPlacementRule = A->ring_id != 0 && B->id < 0;
 
     if (useInteriorPlacementRule && (eOnAB || eOnCD)) {
-        // ... (Keep your existing interior placement rule logic exactly as it is) ...
+        // Interior synthetic starts use a single side-consistent placement to avoid unstable hole edits.
         Vertex* chosen = nullptr;
 
         if (!eOnAB || !eOnCD) {
@@ -338,7 +341,7 @@ std::vector<Vertex*> Geometry::calculateE(Vertex* A, Vertex* B, Vertex* C, Verte
         return candidates;
     }
 
-    // --- ENHANCEMENT: Keep valid intersections AND sample between them ---
+    // Enhancement: keep the paper candidates and also sample between them as fallbacks.
     if (eOnAB) {
         candidates.push_back(eOnAB);
     }
@@ -382,12 +385,13 @@ double Geometry::calculateDisplacementCost(Vertex* A, Vertex* B, Vertex* C, Vert
     double cross_ABE = std::abs(bx * ey - ex * by);
     double cross_CDE = std::abs((dx - cx) * (ey - cy) - (ex - cx) * (dy - cy));
 
-    // Fallback for non-intersecting or parallel segments (Area of simple polygon A-B-C-D-E)
+    // Fallback for parallel or awkward cases: measure the whole local replacement polygon.
     double fallbackArea = triangleArea(0.0, 0.0, bx, by, ex, ey) +
                           triangleArea(bx, by, cx, cy, ex, ey) +
                           triangleArea(cx, cy, dx, dy, ex, ey);
 
     if (cross_ABE <= cross_CDE) {
+        // The lower-cost side is determined by which of the two local triangles survives the collapse.
         double a1 = cy - by; double b1 = bx - cx; double c1 = cx * by - bx * cy;
         double a2 = dy - ey; double b2 = ex - dx; double c2 = dx * ey - ex * dy;
         
@@ -459,6 +463,7 @@ double Geometry::calculateSymmetricDifferenceArea(const Polygon& lhs, const Poly
             continue;
         }
 
+        // Two interior samples are enough here because the cross section is piecewise linear between events.
         double leftSample = x0 + width / 3.0;
         double rightSample = x0 + 2.0 * width / 3.0;
         double leftLength = xorCrossSectionLength(lhsSweep, rhsSweep, leftSample);
@@ -481,7 +486,7 @@ double Geometry::calculateTotalArea(const Polygon& poly) {
         // The Shoelace Formula
         do {
             if (current->isActive) {
-                // Find the next strictly active vertex
+                // Skip over lazily deleted vertices when walking the ring.
                 Vertex* nextV = current->next;
                 while (!nextV->isActive && nextV != ring.head) {
                     nextV = nextV->next;

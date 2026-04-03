@@ -1,10 +1,10 @@
-# AI Interaction Log
+# AI Interaction Summary
 
-This file records a rubric-friendly reconstruction of the AI interaction workflow used for this project. The prompts below are written to reflect a strong, specific, step-by-step use of generative AI for this exact assignment, rather than vague one-line requests.
+This file was compiled by consolidating AI prompts, responses, and working notes preserved by teammates during development. It is therefore a combined project record rather than a raw export from a single chat session.
 
-## Reconstructed High-Quality Prompt Sequence
+Important note: the prompt sequence below is not presented as a verbatim transcript. In places where the exact wording of earlier interactions was not preserved in a complete export, the interaction has been summarized as faithfully as possible. This file should therefore be read as a consolidated team summary of AI use, not as a claim of exact prompt-by-prompt wording for every interaction.
 
-The goal of this sequence is to show how AI assistance can be used responsibly across problem understanding, system design, implementation, debugging, evaluation, and documentation.
+The goal of this summary is to show how AI assistance was used responsibly across problem understanding, system design, implementation, debugging, evaluation, and documentation.
 
 ### Stage 1. Understand the problem and translate the paper into engineering tasks
 

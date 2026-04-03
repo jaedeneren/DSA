@@ -59,6 +59,7 @@ bool isCandidateTraceEnabled() {
 void Simplifier::evaluateAndPush(Vertex* A) {
     if (!A || !A->isActive) return;
 
+    // Every collapse is defined by four consecutive vertices A-B-C-D.
     Vertex* B = A->next;
     Vertex* C = B->next;
     Vertex* D = C->next;
@@ -67,7 +68,7 @@ void Simplifier::evaluateAndPush(Vertex* A) {
     if (A == C || A == D) return; // Skip if ring is too small
     if (A->ring_id != 0 && C->id < 0) return;
 
-    ++A->evalVersion;
+    ++A->evalVersion; // Invalidate older queue entries that started from this same A.
 
     // Get ALL valid geometric candidates
     std::vector<Vertex*> possible_Es = Geometry::calculateE(A, B, C, D);
@@ -86,9 +87,11 @@ void Simplifier::evaluateAndPush(Vertex* A) {
         candidate.cost = Geometry::calculateDisplacementCost(A, B, C, D, E);
         candidate.priorityCost = candidate.cost;
         if (A->id < 0) {
+            // Synthetic starts are allowed, but they are slightly deprioritized by default.
             candidate.priorityCost *= (1.0 + getSyntheticStartPenalty());
         }
         if (i >= 2) {
+            // Interpolated fallback placements come after the paper-defined boundary intersections.
             candidate.priorityCost *= (1.0 + getInterpolatedCandidatePenalty());
         }
 
@@ -127,6 +130,7 @@ void Simplifier::buildInitialQueue()
     for (auto& ring : poly.rings) {
         if (ring.vertexCount < 4) continue;
 
+        // Every active vertex can act as the start of one local A-B-C-D neighborhood.
         Vertex* current = ring.head;
         do {
             if (current->isActive) {
@@ -150,6 +154,7 @@ void Simplifier::run(int targetVertices)
         }
 
         if (best.evalVersion != best.A->evalVersion) {
+            // A newer rebuild has already replaced the candidates that started at A.
             delete best.E;
             continue;
         }
@@ -183,6 +188,7 @@ void Simplifier::run(int targetVertices)
         poly.removeVertex(best.B);
         poly.removeVertex(best.C);
 
+        // Give generated E vertices stable negative ids so later tie-breaks stay deterministic.
         static int stable_id_counter = -1000;
         best.E->id = stable_id_counter--;
         
@@ -201,7 +207,7 @@ void Simplifier::run(int targetVertices)
                       << " cost=" << best.cost << "\n";
         }
 
-        // 4. LOCAL UPDATES ONLY
+        // Only neighborhoods touching the modified chain can have changed costs or validity.
         evaluateAndPush(best.A->prev->prev); 
         evaluateAndPush(best.A->prev);       
         evaluateAndPush(best.A);             

@@ -6,11 +6,13 @@ import re
 import subprocess
 from decimal import Decimal, InvalidOperation
 
+# Directory layout for provided outputs, generated outputs, and source inputs.
 GIVEN_DIR = "output_test_cases"
 MY_DIR = "generated_outputs"
 INPUT_DIR = "input_test_cases"
 HTML_FILE = "Assignment_2_Results_Report.html"
 
+# Human-readable notes used in the report's dataset goal sections.
 NOTES = {
     "output_rectangle_with_two_holes.txt": ("Minimal shell with multiple holes", "Very little slack: one bad collapse can turn the outer shell into a triangle and spike displacement."),
     "output_cushion_with_hexagonal_hole.txt": ("Smooth shell plus angular hole", "The solver must simplify a curved exterior without destabilizing the non-axis-aligned hole."),
@@ -78,6 +80,7 @@ def infer_note(filename):
 
 
 def parse_target_map():
+    # Read requested targets from the root README so the report stays aligned with the repo docs.
     candidates = ["README.md", os.path.join(GIVEN_DIR, "README.md")]
     path = next((p for p in candidates if os.path.exists(p)), None)
     if not path:
@@ -110,6 +113,7 @@ def input_stats(output_name):
 
 
 def parse_lines(lines):
+    # Parse one solver output file into geometry, summary, and performance fields.
     d = {"rings": {}, "vertex_count": 0, "input_area": "N/A", "input_area_raw": "N/A", "output_area": "N/A", "output_area_raw": "N/A", "displacement": "N/A", "displacement_raw": "N/A", "target_vertices": "N/A", "time_ms": None, "memory_mb": None}
     for raw in lines:
         line = raw.strip()
@@ -149,6 +153,7 @@ def parse_file(path):
 
 
 def detect_executable():
+    # Support the repo's different executable names across platforms.
     for c in ("simplify_win.exe", "simplify.exe", "simplify"):
         if os.path.exists(c):
             return os.path.abspath(c)
@@ -164,6 +169,7 @@ def run_solver(exe, csv_path, target):
 
 
 def build_sweep(results, target_map):
+    # Re-run a few representative datasets at multiple targets for the displacement-vs-target plot.
     exe = detect_executable()
     if not exe:
         return []
@@ -198,6 +204,7 @@ def svg(rings, min_x, max_x, min_y, max_y, fill, stroke):
     for ring_id, verts in sorted(rings.items()):
         if not verts:
             continue
+        # The outer ring and holes share the same viewport but use different stroke styles.
         sx, sy = tx(verts[0][0]), ty(verts[0][1])
         ring_path = f"M {sx},{sy} "
         vertex_color = "#e74c3c" if ring_id == 0 else "#ff7f11"
@@ -224,6 +231,7 @@ def ring_summary(rings):
 
 
 def fit(points, basis):
+    # Fit a single-coefficient model y = c * basis(x) for simple scaling-law summaries.
     if not points:
         return {"coefficient": 0.0, "r2": 0.0, "predicted": []}
     pairs = [(basis(p["x"]), p["y"]) for p in points if basis(p["x"]) > 0]

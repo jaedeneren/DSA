@@ -16,18 +16,18 @@ class SpatialMap {
 private:
     double cellSize = 500.0; // Grid cell size. Tune this based on your dataset!
     
-    // The Spatial Grid: Maps a Grid Coordinate (X, Y) to a list of Line Segments
+    // Maps each grid cell to the segments whose bounding boxes overlap that cell.
     std::unordered_map<std::pair<int, int>, std::vector<std::pair<Vertex*, Vertex*>>, CellHash> grid;
 
-    // Helper math functions for intersection testing
+    // Geometry helpers used during segment-intersection tests.
     std::vector<std::pair<int, int>> getCellsForSegment(Vertex* v1, Vertex* v2);
     bool checkIntersection(Vertex* p1, Vertex* p2, Vertex* q1, Vertex* q2);
     int orientation(Vertex* p, Vertex* q, Vertex* r);
     bool onSegment(Vertex* p, Vertex* q, Vertex* r);
 
 public:
-    void buildIndex(const Polygon& poly);
+    void buildIndex(const Polygon& poly);              // Index every currently active segment
     bool isTopologyValid(Vertex* A, Vertex* B, Vertex* C, Vertex* D, Vertex* E);
     int countInactiveOriginalCrossings(Vertex* A, Vertex* B, Vertex* C, Vertex* D, Vertex* E);
-    void updateIndex(Vertex* A, Vertex* D, Vertex* E);
+    void updateIndex(Vertex* A, Vertex* D, Vertex* E); // Add the new AE and ED segments after a collapse
 };

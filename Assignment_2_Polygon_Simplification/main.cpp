@@ -21,6 +21,7 @@ int main(int argc, char* argv[]) {
     Polygon poly;
     poly.loadFromCSV(filename.c_str());
 
+    // Keep a second copy so the final symmetric difference can be measured exactly.
     Polygon originalPoly;
     originalPoly.loadFromCSV(filename.c_str());
 
@@ -48,12 +49,12 @@ int main(int argc, char* argv[]) {
     // 3. Report the actual displacement between input and final output
     simplifier.totalDisplacement = Geometry::calculateSymmetricDifferenceArea(originalPoly, poly);
 
-    // 4. Print the vertices
+    // Print the simplified polygon first so the output file stays in the required format.
     poly.printToCSV();
 
-    // 5. Print the required summary in scientific notation
-    std::cout << "Target vertices: " << targetVertices << "\n"; // <--- ADD THIS LINE HERE
-    
+    // Follow with the required summary block.
+    std::cout << "Target vertices: " << targetVertices << "\n";
+
     std::cout << std::scientific << std::setprecision(6);
     std::cout << "Total signed area in input: " << initialArea << "\n";
     std::cout << "Total signed area in output: " << finalArea << "\n";
@@ -66,7 +67,7 @@ int main(int argc, char* argv[]) {
 #ifndef _WIN32
     struct rusage usage;
     getrusage(RUSAGE_SELF, &usage);
-    
+
     // Note: ru_maxrss is in Kilobytes on Linux, but Bytes on macOS.
     // Assuming a standard Linux environment, divide by 1024.0 to get Megabytes.
     peakMemoryMB = usage.ru_maxrss / 1024.0;

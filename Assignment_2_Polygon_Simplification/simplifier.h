@@ -5,12 +5,12 @@
 #include "spatialmap.h"
 
 struct CollapseCandidate {
-    Vertex *A, *B, *C, *D;
+    Vertex *A, *B, *C, *D;                             // Consecutive active vertices considered for collapse
     Vertex *E; // The proposed replacement
-    double cost;
-    double priorityCost;
-    int candidateRank;
-    int evalVersion;
+    double cost;                                       // Pure geometric displacement estimate
+    double priorityCost;                               // Queue score after optional penalties
+    int candidateRank;                                 // Earlier paper-style candidates win ties
+    int evalVersion;                                   // Used to reject stale queue entries
     
     bool operator>(const CollapseCandidate& other) const {
         if (std::abs(priorityCost - other.priorityCost) > 1e-12) return priorityCost > other.priorityCost;
@@ -26,10 +26,10 @@ struct CollapseCandidate {
 class Simplifier {
 private:
     Polygon& poly;
-    SpatialMap spatialMap;
+    SpatialMap spatialMap;                             // Accelerates local topology checks
     std::priority_queue<CollapseCandidate, std::vector<CollapseCandidate>, std::greater<CollapseCandidate>> pq;
 
-    void evaluateAndPush(Vertex* A);
+    void evaluateAndPush(Vertex* A);                   // Rebuild every candidate that starts at A
 
 public:
     double totalDisplacement = 0.0;

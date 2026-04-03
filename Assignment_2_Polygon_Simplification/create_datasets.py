@@ -1,9 +1,11 @@
 import math
 import os
 
+# Write all generated custom datasets into the same folder used by the solver.
 os.makedirs("input_test_cases", exist_ok=True)
 
 def write_csv(filename, rings):
+    # Each ring is emitted in the assignment's ring_id,vertex_id,x,y format.
     with open(f"input_test_cases/{filename}", "w") as f:
         f.write("ring_id,vertex_id,x,y\n")
         for r_id, ring in enumerate(rings):
@@ -32,6 +34,7 @@ print("- input_custom_high_vertex.csv created.")
 # 3. Narrow Gaps (Targets Spatial Index edge-cases)
 eps = 0.001
 outer, inner = [], []
+# Build two nearly touching rectangles so topology checks have very little slack.
 for i in range(100): outer.append((i/10.0, 0))
 for i in range(100): outer.append((10, i/10.0))
 for i in range(100): outer.append((10 - i/10.0, 10))

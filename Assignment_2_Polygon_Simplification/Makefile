@@ -8,21 +8,25 @@ OUT_DIR = generated_outputs
 SOURCES = $(wildcard $(SRC_DIR)/*.cpp)
 OBJECTS = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SOURCES))
 
-ifeq ($(OS),Windows_NT)
-EXECUTABLE = simplify.exe
-else
 EXECUTABLE = simplify
+ifeq ($(OS),Windows_NT)
+WINDOWS_EXECUTABLE = simplify.exe
 endif
 
 # Default target vertices for inputs without a custom override.
 TARGET_VERTICES_DEFAULT = 99
 
-all: $(EXECUTABLE)
+all: $(EXECUTABLE) $(WINDOWS_EXECUTABLE)
 
 .PHONY: all run generate_outputs clean
 
 $(EXECUTABLE): $(OBJECTS)
 	$(CXX) $(CXXFLAGS) $^ -o $@
+
+ifdef WINDOWS_EXECUTABLE
+$(WINDOWS_EXECUTABLE): $(EXECUTABLE)
+	cp -f $(EXECUTABLE) $(WINDOWS_EXECUTABLE)
+endif
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p $(OBJ_DIR)
@@ -60,4 +64,4 @@ run: $(EXECUTABLE) $(OUT_DIR)
 generate_outputs: run
 
 clean:
-	rm -rf $(OBJ_DIR) $(EXECUTABLE) $(OUT_DIR)
+	rm -rf $(OBJ_DIR) $(EXECUTABLE) $(WINDOWS_EXECUTABLE) $(OUT_DIR)

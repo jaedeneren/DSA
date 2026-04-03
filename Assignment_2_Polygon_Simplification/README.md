@@ -33,24 +33,24 @@ These are extra datasets for the "generate your own meaningful test datasets" pa
 
 | Input file | Vertices | Holes | Suggested target | What it stresses |
 |---|---|---|---|---|
-| `input_custom_narrow_gaps_with_three_holes.csv` | 16 | 3 | 10 | Narrow clearances between holes and the outer shell |
-| `input_custom_comb_bays_with_inner_hole.csv` | 18 | 1 | 10 | Alternating concave bays and a hole near the base |
-| `input_custom_dense_hole_grid.csv` | 40 | 9 | 24 | Many small holes packed into one exterior ring |
-| `input_custom_near_collinear_wavy_shell.csv` | 25 | 0 | 12 | Near-collinear edges and small vertical perturbations |
-| `input_custom_pinch_corridor_with_two_holes.csv` | 20 | 2 | 12 | A narrow pinch corridor that can easily cause topology errors |
+| `input_custom_high_hole.csv` | 404 | 100 | 350 | Large number of holes packed inside one outer shell |
+| `input_custom_high_vertex.csv` | 15000 | 0 | 500 | Very high vertex count for scalability testing |
+| `input_custom_narrow_gaps.csv` | 800 | 1 | 50 | Extremely small clearance between the outer ring and the hole |
+| `input_custom_near_degeneracies.csv` | 2000 | 0 | 100 | Near-degenerate geometry with almost-identical alternating radii |
+| `input_custom_combined.csv` | 5200 | 50 | 1500 | Combined stress test with many vertices, many holes, and near-degeneracies |
 
 ### Why these help
 
-- `input_custom_narrow_gaps_with_three_holes.csv`
-  Tests whether simplification respects small separations between holes and the exterior boundary instead of creating accidental intersections.
-- `input_custom_comb_bays_with_inner_hole.csv`
-  Gives the algorithm several sharp concavities, so you can discuss whether the greedy collapse order handles repeated bays well.
-- `input_custom_dense_hole_grid.csv`
-  Stresses ring bookkeeping and topology validation because there are many interior rings in a relatively small space.
-- `input_custom_near_collinear_wavy_shell.csv`
-  Targets numerical stability: many vertices are almost collinear, so small placement errors can noticeably change displacement.
-- `input_custom_pinch_corridor_with_two_holes.csv`
-  Useful for checking whether collapses preserve a narrow passage and avoid merging nearby boundaries.
+- `input_custom_high_hole.csv`
+  Stresses ring bookkeeping and topology validation by packing 100 small holes inside a single outer boundary.
+- `input_custom_high_vertex.csv`
+  Tests runtime scaling on a large single-ring polygon with 15,000 vertices.
+- `input_custom_narrow_gaps.csv`
+  Checks whether the simplifier preserves topology when the outer boundary and inner hole are separated by a very small gap.
+- `input_custom_near_degeneracies.csv`
+  Targets numerical stability using a nearly circular polygon whose radius alternates by a tiny amount.
+- `input_custom_combined.csv`
+  Combines high vertex count, many holes, and near-degenerate geometry into one overall stress test.
 
 ## Usage
 
@@ -68,6 +68,50 @@ make run
 
 This is only needed if you want to regenerate the C++ program outputs yourself. It processes every `input_test_cases/input_*.csv` file and writes the results into `generated_outputs/my_output_*.txt`.
 
+## Dependencies
+
+If you only want to inspect the submitted outputs and report, no installation is required.
+
+If you want to regenerate outputs locally, install:
+
+- Python 3
+  Needed for `generate_html.py`.
+- A C++17-compatible compiler
+  For example, `g++` on Linux, MinGW-w64 `g++` on Windows, or Apple Clang on macOS.
+- `make`
+  Needed to use the provided [Makefile]
+
+### Setup Notes
+
+- Windows
+  Install Python 3 from python.org. Install MinGW-w64 or MSYS2 so `g++` and `make` are available in your terminal `PATH`.
+- Linux
+  Install Python 3, `g++`, and `make` using your package manager.
+- macOS
+  Install Python 3, then install Xcode Command Line Tools so `clang++` and `make` are available.
+
+After installation, you should be able to run:
+
+```sh
+make
+```
+
+to build the executable `simplify`. On Windows, the Makefile also leaves a `simplify.exe` copy for convenience.
+
+You can then run:
+
+```sh
+make run
+```
+
+to regenerate the output files, and:
+
+```sh
+python3 generate_html.py
+```
+
+to regenerate the HTML report.
+
 ## HTML Report
 
 ```sh
@@ -84,11 +128,6 @@ The current implementation has been checked against all 15 instructor-provided r
 - Topology is preserved: ring counts are unchanged, with no self-intersections or ring crossings in the validated outputs.
 - For all 15 provided benchmark cases, the generated output is equal to or lower than the provided areal displacement.
 - For `rectangle_with_two_holes` with target `7`, the solver stops at `11` vertices because no further valid collapse is accepted without violating the required constraints.
-
-## Dependencies
-
-- Python 3 for `generate_html.py`
-- A C++17-compatible compiler and `make` only if you want to rebuild and rerun the simplifier locally
 
 ## Implementation Summary
 

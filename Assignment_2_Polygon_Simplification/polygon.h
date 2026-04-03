@@ -8,12 +8,12 @@
 
 struct Vertex {
     int id;
-    int ring_id;
+    int ring_id;                                       // 0 = exterior ring, >0 = hole
     double x, y;
-    int evalVersion;
+    int evalVersion;                                   // Bumped whenever candidates from this start vertex are rebuilt
     Vertex* prev;
     Vertex* next;
-    bool isActive;                                      // For lazy deletion
+    bool isActive;                                     // Vertices stay allocated and are retired lazily
 
     Vertex(int _id, int _ring_id, double _x, double _y) 
         : id(_id), ring_id(_ring_id), x(_x), y(_y), evalVersion(0), prev(nullptr), next(nullptr), isActive(true) {}
@@ -23,7 +23,7 @@ struct Ring {
     int ring_id;
     Vertex* head;
     int vertexCount;
-    std::vector<Vertex*> allVertices;
+    std::vector<Vertex*> allVertices;                  // Owns every vertex ever created for this ring
     
     Ring(int _ring_id);
     ~Ring();
@@ -40,11 +40,11 @@ struct Ring {
 
 class Polygon {
 public:
-    std::vector<Ring> rings;
-    int totalVertices = 0;
+    std::vector<Ring> rings;                           // Ring 0 is the shell, the rest are holes
+    int totalVertices = 0;                             // Counts currently active vertices across all rings
 
     void loadFromCSV(const char* filename);
     void printToCSV() const;
-    void removeVertex(Vertex* v);                       // Update prev/next pointers here
+    void removeVertex(Vertex* v);                      // Delegate local removal to the owning ring
     void insertVertexAfter(Vertex* v, Vertex* newV);
 };

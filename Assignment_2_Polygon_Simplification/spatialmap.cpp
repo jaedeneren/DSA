@@ -3,6 +3,7 @@
 #include <unordered_set>
 
 namespace {
+// Treat undirected segments as the same key so duplicate counting is avoided.
 std::uint64_t makeSegmentKey(Vertex* a, Vertex* b) {
     std::uintptr_t lo = reinterpret_cast<std::uintptr_t>(std::min(a, b));
     std::uintptr_t hi = reinterpret_cast<std::uintptr_t>(std::max(a, b));
@@ -68,6 +69,7 @@ bool SpatialMap::checkIntersection(Vertex* p1, Vertex* p2, Vertex* q1, Vertex* q
 std::vector<std::pair<int, int>> SpatialMap::getCellsForSegment(Vertex* v1, Vertex* v2) {
     std::vector<std::pair<int, int>> cells;
     
+    // A segment is stored in every grid cell touched by its axis-aligned bounding box.
     int minX = static_cast<int>(std::floor(std::min(v1->x, v2->x) / cellSize));
     int maxX = static_cast<int>(std::floor(std::max(v1->x, v2->x) / cellSize));
     int minY = static_cast<int>(std::floor(std::min(v1->y, v2->y) / cellSize));
@@ -138,7 +140,7 @@ int SpatialMap::countInactiveOriginalCrossings(Vertex* A, Vertex* B, Vertex* C, 
     std::vector<std::pair<int, int>> cellsToCheck = cellsAE;
     cellsToCheck.insert(cellsToCheck.end(), cellsED.begin(), cellsED.end());
 
-    std::unordered_set<std::uint64_t> countedSegments;
+    std::unordered_set<std::uint64_t> countedSegments; // Prevent double-counting segments seen in multiple cells
     int conflicts = 0;
 
     for (const auto& cell : cellsToCheck) {
