@@ -78,8 +78,9 @@ def infer_note(filename):
 
 
 def parse_target_map():
-    path = os.path.join(GIVEN_DIR, "README.md")
-    if not os.path.exists(path):
+    candidates = ["README.md", os.path.join(GIVEN_DIR, "README.md")]
+    path = next((p for p in candidates if os.path.exists(p)), None)
+    if not path:
         return {}
     pat = re.compile(r"\|\s*`input_(.+?)\.csv`\s*\|.*\|\s*(\d+)\s*\|\s*`output_.+?\.txt`\s*\|")
     out = {}

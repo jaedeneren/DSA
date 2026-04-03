@@ -54,8 +54,38 @@ These are extra datasets for the "generate your own meaningful test datasets" pa
 
 ## Usage
 
-```
-./area_and_topology_preserving_polygon_simplification <input_file> <target_vertices>
+```sh
+./simplify <input_file> <target_vertices>
 ```
 
-The program reads a CSV with columns `ring_id,vertex_id,x,y` and writes simplified output to stdout.
+The program reads a CSV with columns `ring_id,vertex_id,x,y` and writes simplified output to stdout. If you are only reviewing the results in this repository, you do not need to run this command locally.
+
+## Generate Outputs
+
+```sh
+make run
+```
+
+This is only needed if you want to regenerate the C++ program outputs yourself. It processes every `input_test_cases/input_*.csv` file and writes the results into `generated_outputs/my_output_*.txt`.
+
+## HTML Report
+
+```sh
+python generate_html.py
+```
+
+This regenerates [Assignment2_Results_Report.html](Assignment2_Results_Report.html) from the current generated outputs.
+
+## Test Results
+
+The current implementation has been checked against all 15 instructor-provided reference outputs in `output_test_cases/`.
+
+- Area is preserved to floating-point tolerance in the generated outputs.
+- Topology is preserved: ring counts are unchanged, with no self-intersections or ring crossings in the validated outputs.
+- For all 15 provided benchmark cases, the generated output is equal to or lower than the provided areal displacement.
+- For `rectangle_with_two_holes` with target `7`, the solver stops at `11` vertices because no further valid collapse is accepted without violating the required constraints.
+
+## Dependencies
+
+- Python 3 for `generate_html.py`
+- A C++17-compatible compiler and `make` only if you want to rebuild and rerun the simplifier locally
