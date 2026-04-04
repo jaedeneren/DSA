@@ -2,30 +2,78 @@
 
 ## Introduction
 
-This project implements area-and-topology-preserving polygon simplification using Area-Preserving Segment Collapse (APSC) as the core idea. Generative AI was used as a coding and debugging assistant throughout the work. My prompting strategy changed over time. At the beginning, I asked broad design questions about how to represent polygon rings, what data structures would support repeated local edits, and how to maintain topological validity efficiently. Later, the prompts became more specific and task-oriented: how to manage a priority queue with stale entries, how to structure linked-list updates safely, how to compare generated outputs against expected files, and how to present the results clearly in the HTML report.
+This project implements area-and-topology-preserving polygon simplification based on the Area-Preserving Segment Collapse (APSC) idea discussed by Kronenfeld et al. The assignment required much more than a basic simplifier. The implementation had to preserve polygon structure, maintain ring validity, respect the stopping conditions in the specification, and keep areal displacement low across both provided and custom datasets. In practice, this meant that the work combined algorithm design, geometry implementation, debugging, benchmarking, and report generation.
 
-AI was most helpful on tasks where a strong programming pattern existed, but the final implementation still needed human review. Examples include modularizing the code into geometry, polygon, simplifier, and spatial-index components; drafting boilerplate for parsing CSV files; and suggesting implementation patterns such as lazy deletion and neighbourhood-based updates. That support accelerated development, but it did not replace the need to verify the algorithmic details against the assignment requirements and the Kronenfeld et al. paper.
+Generative AI was used throughout the project as an assistant for design discussion, implementation scaffolding, debugging, and documentation. The team did not use AI as an unquestioned source of truth. Instead, AI was treated as a fast technical assistant whose suggestions had to be checked against the assignment brief, the expected outputs, and the actual behavior of the code. This distinction was especially important because the project deals with computational geometry, where a suggestion can appear reasonable at a high level while still being wrong in a subtle but important way.
+
+The nature of AI use changed over time. Early prompts focused on understanding the problem and converting the paper into implementable engineering tasks. Later prompts became narrower and more concrete, such as how to represent polygon rings for repeated local edits, how to manage stale priority-queue entries safely, how to update a spatial index efficiently after a collapse, and how to build the HTML report required for evaluation. As development progressed, AI support shifted further toward debugging mismatches against benchmark outputs and improving the clarity of the final deliverables.
+
+## How AI Was Used
+
+AI assistance was used in four main areas.
+
+First, it helped break the assignment into manageable engineering components. The project needed a clear separation between geometry utilities, polygon and ring data structures, simplification logic, topology checking, command-line execution, and report generation. AI was useful for turning the paper-level description of APSC into a concrete implementation plan with modules and responsibilities.
+
+Second, AI helped propose implementation patterns. Examples include using circular doubly linked lists for repeated local vertex removal, lazy invalidation for priority-queue entries, and a lightweight spatial grid for accelerating edge-intersection checks. These suggestions were not copied blindly, but they were valuable as starting points because they matched the local-update nature of the algorithm better than more naive alternatives.
+
+Third, AI was used as a debugging assistant. When outputs differed from expected benchmark behavior, AI was asked to rank likely causes and suggest what invariants should be rechecked. This was particularly useful for diagnosing stale-neighborhood problems, update-order bugs in linked-list rewiring, and cases where fallback simplification candidates led to worse displacement.
+
+Fourth, AI supported documentation and presentation work. It helped structure the HTML report, organize rubric-oriented sections, suggest charting strategies for difficult scales, and improve the clarity of the explanation surrounding datasets, performance, and displacement behavior. AI also helped with utility code for parsing results and formatting tables or charts cleanly.
 
 ## Analysis of AI Suggestions
 
-Several AI suggestions were clearly useful. First, the recommendation to represent each ring as a circular doubly linked list was important because APSC repeatedly removes and reconnects local neighbourhoods. A plain array-based representation would have made those local edits much more expensive. Second, the suggestion to use lazy invalidation for vertices and queue entries helped keep the candidate-selection logic efficient. Rather than rebuilding the entire priority queue every time a nearby collapse changed the local geometry, the implementation can discard stale entries when they rise to the top. Third, the AI suggested using a lightweight spatial grid for topology checks, which fit the project well because it kept the code self-contained while still reducing the cost of intersection testing.
+Some AI suggestions were clearly useful and remained close to the final implementation.
 
-Other suggestions were only partially correct and had to be revised. One early idea used a simpler heuristic for placing the replacement point `E`. Although it could preserve area, it did not reliably minimize areal displacement the way the assignment requires, so that logic had to be replaced by a more faithful implementation of the APSC approach. Another issue appeared in linked-list updates: one AI-generated version marked a vertex inactive too early, which prevented the actual neighbour pointers from being rewired correctly. That bug could only be found by stepping through the code carefully and reasoning about the update order.
+One strong suggestion was to represent each polygon ring as a circular doubly linked list. This fit the assignment well because accepted collapses only affect a small neighborhood at a time. A linked representation makes local rewiring much more practical than repeated removal from a plain array, while still keeping predecessor and successor access straightforward.
 
-The queue-management logic also needed human correction. Some collapse candidates remained technically present in the queue even after nearby edits had changed the local sequence of vertices. Those entries looked superficially valid, but they no longer represented the intended `A-B-C-D` neighbourhood. The fix was to explicitly revalidate the neighbourhood before accepting a collapse. Finally, the work on benchmark matching showed that debugging had to include the documentation and workflow too, not only the algorithm. For example, the rectangle-with-two-holes case required careful interpretation of the target and final-vertex-count behaviour, and later the Makefile/README expectations for the deliverables also had to be aligned with the project requirements.
+Another useful suggestion was the lazy-deletion approach for candidate management. Because each collapse changes only a local part of the polygon, it would be wasteful to rebuild the entire priority queue after every accepted operation. AI suggested storing candidates in the queue and revalidating them only when they reach the top. That pattern was appropriate for this project and influenced the final design.
+
+The recommendation to use a lightweight spatial grid for topology checks was also productive. The assignment did not require or encourage heavy external geometry libraries, so a simple self-contained spatial structure was a good fit. AI helped identify the grid as a better engineering compromise than a more elaborate spatial hierarchy for this scale of project.
+
+However, several suggestions were only partially correct and had to be revised.
+
+One early simplification idea for choosing the replacement point `E` preserved area in a broad sense but did not faithfully reflect the intended APSC behavior for minimizing displacement. That suggestion was not sufficient for the assignment and had to be replaced by a more careful implementation aligned with the project requirements and the paper's intent.
+
+Another issue arose in linked-list updates. One AI-assisted version of the logic deactivated vertices too early, which interfered with proper neighbor rewiring. The code looked plausible, but careful tracing showed that the update order mattered. This was a clear example of AI producing code that was syntactically acceptable while still violating important invariants.
+
+The queue-management logic also needed human correction. In this project, a candidate is not safe merely because its vertices are still marked active. A nearby accepted collapse can change the actual local sequence, meaning a stored `A-B-C-D` neighborhood may no longer be the same neighborhood when the candidate resurfaces. AI pointed toward lazy invalidation as a useful pattern, but the final implementation still required explicit revalidation of adjacency and neighborhood structure before accepting a collapse.
+
+AI suggestions related to stopping conditions also needed scrutiny. In some cases, continuing to simplify toward the target vertex count was technically possible in a narrow sense but produced much worse displacement or undesirable degradation of the exterior ring. This appeared in the `rectangle_with_two_holes` case, where benchmark interpretation and assignment intent mattered more than simply forcing the count downward. Human review was required to translate the assignment rules into a principled stopping policy.
 
 ## Reflection on AI Assistance
 
-Using AI changed the nature of the work. Instead of spending most of the time writing standard C++ syntax from scratch, I spent more time evaluating suggestions, checking invariants, and verifying behaviour against the expected outputs. In that sense, AI worked best as a fast drafting and brainstorming partner. It was especially effective for repetitive scaffolding, refactoring, and presentation tasks such as reorganizing the report generator, improving chart readability, and formatting results consistently.
+AI improved development speed most on tasks where a strong programming pattern already existed. Examples include modular code organization, queue invalidation patterns, CSV parsing utilities, result summarization, chart generation, and HTML report structure. In these areas, AI reduced the time spent on boilerplate and helped the team move more quickly toward testing and validation.
 
-At the same time, this project showed the limits of AI very clearly. Computational geometry is full of plausible-but-wrong answers: a suggested simplification step can look reasonable while still violating a subtle topological condition or increasing displacement in a way that only appears on a hard benchmark. Because of that, I could not accept nontrivial suggestions without verification. Human judgment was essential whenever the task depended on geometric correctness, ring topology, benchmarking interpretation, or honest documentation of what the implementation actually does. The most valuable lesson was that AI is strongest when used critically. It can speed up exploration, but the final responsibility for correctness, testing, and design still belongs to the developer.
+At the same time, the project also demonstrated the limits of AI very clearly. Geometry-heavy code is unusually sensitive to hidden assumptions. A suggestion can sound convincing while still failing to preserve the exact local structure needed by the algorithm. Similarly, a debugging explanation can be directionally correct without being sufficient to produce an acceptable final solver. The difference between a valid result and a low-quality result often depended on small implementation details, not on broad conceptual summaries.
+
+This meant that the team's effort shifted away from raw code drafting and toward critical evaluation. AI-generated ideas were treated as hypotheses to test, not as finished solutions. The most important human responsibilities were checking invariants, comparing produced outputs against the provided reference outputs, interpreting the assignment rules accurately, and deciding when an apparently valid simplification was still the wrong engineering choice because of displacement quality or topology risk.
+
+The project therefore reinforced a useful lesson about responsible AI use in software engineering. AI is most effective when used to accelerate exploration, drafting, and iteration. It is much less reliable when treated as an authority on correctness in a specialized domain. Final responsibility for algorithm design, validation, testing, and honest reporting remained with the team.
 
 ## Distribution of Work with AI and Within the Team
 
-AI contributed in several concrete ways. It helped draft code structure, suggested ring and queue data structures, proposed the spatial-grid idea for intersection checks, assisted with CSV and report-generation utilities, and supported debugging by surfacing likely causes when output files did not match expectations. It also helped improve the HTML report by adding charts, exact-value formatting, clearer visualizations, and rubric-oriented sections.
+AI contributed to the project in several concrete ways:
 
-The human contribution was responsible for the core engineering decisions and all final validation. I chose which AI suggestions to adopt, corrected the incorrect ones, and verified the implementation against the instructor outputs. I also handled the algorithm-specific reasoning needed to prevent stale collapses, protect the exterior ring from pathological over-simplification, and bias candidate selection toward lower-displacement outcomes. On the reporting side, I checked the rubric requirements and adjusted the README and HTML report, so the deliverables reflected the actual state of the project rather than an idealized description.
+- breaking the assignment and paper into implementable engineering tasks
+- proposing data-structure choices such as circular doubly linked rings and lazy queue invalidation
+- suggesting an efficient self-contained spatial-grid approach for topology checks
+- assisting with utility code for parsing results, formatting tables, and generating the HTML report
+- supporting debugging by surfacing likely causes of benchmark mismatches and over-simplification behavior
+- improving the structure and presentation of the final documentation
 
-If this repository is submitted as a team project, the human side of the work should be expanded to name the individual responsibilities of the teammates. In the current text, the human role is written from the perspective of the repository owner and the recorded working session.
+The team remained responsible for the substantive technical work:
 
-Word count: 909
+- deciding which AI suggestions were worth adopting and which needed to be rejected
+- implementing and correcting the algorithmic details of the simplifier
+- validating all nontrivial design decisions against the assignment brief, the paper, and the benchmark outputs
+- debugging incorrect local updates, stale candidates, and stopping-condition behavior
+- evaluating the quality of simplification results rather than relying only on vertex-count reduction
+- ensuring that the final report described the real implementation and results accurately
+
+Because this was a group effort, AI use should be understood as support applied across shared development tasks rather than as authorship of the project. The final code, debugging decisions, testing judgments, and deliverable preparation were all filtered through team review. AI accelerated parts of the workflow, but it did not replace the team's responsibility for correctness or academic integrity.
+
+## Conclusion
+
+Overall, AI made a meaningful positive contribution to the project, especially in planning, scaffolding, debugging direction, and report-generation support. Its suggestions often saved time and exposed useful implementation patterns. However, the project also made it clear that AI assistance is only valuable when paired with careful human verification. For this assignment, the most important work was not simply generating code, but judging whether the generated ideas preserved topology correctly, matched the intended APSC behavior, and satisfied the actual grading requirements. That judgment remained a team responsibility throughout the project.
+
+Word count: 1299
